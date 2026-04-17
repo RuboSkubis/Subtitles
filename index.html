@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="styles/style.css">
 </head>
 
 <body>
@@ -18,18 +19,8 @@
         <pre id="thirdOutPut"></pre>
         <pre id="forthOutPut"></pre>
     </div>
-    <script type="text/javascript">
-        document.getElementById('inputfile')
-            .addEventListener('change', function () {
+    <script type="text/javascript" src="js/script.js">
 
-                let fr = new FileReader();
-                fr.onload = function () {
-                    document.getElementById('output')
-                        .textContent = fr.result;
-                }
-
-                fr.readAsBinaryString(this.files[0]);
-            })
     </script>
 
 </body>
