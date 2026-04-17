@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script type="text/javascript">
+        document.getElementById('inputfile')
+            .addEventListener('change', function () {
+
+                let fr = new FileReader();
+                fr.onload = function () {
+                    document.getElementById('output')
+                        .textContent = fr.result;
+                }
+
+                fr.readAsBinaryString(this.files[0]);
+            })
+    </script>
+
+</body>
+
+</html>
