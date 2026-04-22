@@ -15,8 +15,8 @@
             console.log(arrayDeMarcasUno);
             
 
-          // console.log(typeof fr.result);
-          // console.log(fr.result.length);
+          console.log(typeof fr.result);
+          console.log(fr.result.length);
         }
 
         fr.readAsBinaryString(this.files[0]);
