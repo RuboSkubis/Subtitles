@@ -1,4 +1,4 @@
-import { createRoot } from 'react-dom/client';
+import { createRoot } from '../node_modules/react-dom/client';
 
 // Borra el contenido HTML existente
 document.body.innerHTML = '<div id="app"></div>';
