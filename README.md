@@ -1,2 +1,0 @@
-# Subtitles
-Mi tfg.
