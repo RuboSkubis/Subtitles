@@ -1,5 +1,4 @@
 
-    
     let arrayDeMarcasUno;
     let arrayDeMarcasDos;
     
