@@ -22,7 +22,7 @@
         }
 
         fr.readAsBinaryString(this.files[0]);
-        console.log( this.files[0]);
+        // console.log( this.files[0]);
       });
 
 
@@ -36,7 +36,7 @@
             arrayDeMarcasDos = fr.result.match(regexp);
              let textoPre = arrayDeMarcasDos.join("\n\n");
             document.getElementById("forthOutPut").textContent=textoPre;
-            console.log(arrayDeMarcasDos);
+            // console.log(arrayDeMarcasDos);
 
           // console.log(typeof fr.result);
           // console.log(fr.result.length);
