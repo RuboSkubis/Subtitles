@@ -7,21 +7,18 @@
       .addEventListener('change', function () {
 
         let fr = new FileReader();
-        fr.onload = function () {
-          document.getElementById('output')
-            .textContent = fr.result;
-            arrayDeMarcasUno = fr.result.match(regexp);
-            let textoPre = arrayDeMarcasUno.join("\n\n");
-            document.getElementById("secOutPut").textContent=textoPre;
-            //console.log(arrayDeMarcasUno);
-            
 
-          //console.log(typeof fr.result);
-          //console.log(fr.result.length);
+        fr.onload = function () {
+          document.getElementById('output').textContent = fr.result;
+
+          arrayDeMarcasUno = fr.result.match(regexp);
+          let textoPre = arrayDeMarcasUno.join("\n\n");
+
+          document.getElementById("secOutPut").textContent=textoPre;
         }
 
         fr.readAsBinaryString(this.files[0]);
-        // console.log( this.files[0]);
+       
       });
 
 
@@ -29,17 +26,15 @@
       .addEventListener('change', function () {
 
         let fr = new FileReader();
+        
         fr.onload = function () {
-          document.getElementById('thirdOutPut')
-            .textContent = fr.result;
-            arrayDeMarcasDos = fr.result.match(regexp);
-             let textoPre = arrayDeMarcasDos.join("\n\n");
-            document.getElementById("forthOutPut").textContent=textoPre;
-            // console.log(arrayDeMarcasDos);
+        document.getElementById('thirdOutPut').textContent = fr.result;
 
-          // console.log(typeof fr.result);
-          // console.log(fr.result.length);
+        arrayDeMarcasDos = fr.result.match(regexp);
+        let textoPre = arrayDeMarcasDos.join("\n\n");
+
+        document.getElementById("forthOutPut").textContent=textoPre;
         }
 
         fr.readAsBinaryString(this.files[0]);
-      })
+      });
