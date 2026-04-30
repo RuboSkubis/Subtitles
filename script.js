@@ -13,7 +13,7 @@ function readAndWrite(a, b, c,fichero) {
     a.textContent = fr.result;
 
     c = fr.result.match(regexp);
-    let textoPre = arrayDeMarcasUno.join("\n\n");
+    let textoPre = c.join("\n\n");
 
     b.textContent = textoPre;
   }
