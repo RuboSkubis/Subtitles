@@ -1,20 +1,23 @@
-
     let arrayDeMarcasUno;
     let arrayDeMarcasDos;
-    
     let regexp = /\d\d.\d\d.\d\d.\d\d\d\s...\s\d\d.\d\d.\d\d.\d\d\d/g;
+    let FirstOutPut = document.getElementById('output');
+    let SecondOutPut = document.getElementById("secOutPut");
+    let ThirdOutPut = document.getElementById('thirdOutPut');
+    let ForthOutPut = document.getElementById("forthOutPut");
+
     document.getElementById('inputfile')
       .addEventListener('change', function () {
 
         let fr = new FileReader();
 
         fr.onload = function () {
-          document.getElementById('output').textContent = fr.result;
+          FirstOutPut.textContent = fr.result;
 
           arrayDeMarcasUno = fr.result.match(regexp);
           let textoPre = arrayDeMarcasUno.join("\n\n");
 
-          document.getElementById("secOutPut").textContent=textoPre;
+          SecondOutPut.textContent=textoPre;
         }
 
         fr.readAsBinaryString(this.files[0]);
@@ -26,14 +29,14 @@
       .addEventListener('change', function () {
 
         let fr = new FileReader();
-        
+
         fr.onload = function () {
-        document.getElementById('thirdOutPut').textContent = fr.result;
+        ThirdOutPut.textContent = fr.result;
 
         arrayDeMarcasDos = fr.result.match(regexp);
         let textoPre = arrayDeMarcasDos.join("\n\n");
 
-        document.getElementById("forthOutPut").textContent=textoPre;
+        ForthOutPut.textContent=textoPre;
         }
 
         fr.readAsBinaryString(this.files[0]);
