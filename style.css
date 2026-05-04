@@ -4,3 +4,9 @@
     pre{
       margin:10px;
     }
+    .modeButton{
+
+    }
+    #persistenceSeconds{
+      max-width: 75px;
+    }
