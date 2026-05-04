@@ -32,6 +32,22 @@ function Subtitle(inicio, final, contenido) {
   this.contenido = contenido;
 }
 
+function download(data, filename) {
+
+  let enlaceDeDescarga = document.getElementById("descarga");
+  enlaceDeDescarga.download = filename;
+  enlaceDeDescarga.hidden = false;
+
+  let blob = new Blob([data], { type: 'text/plain' });
+  enlaceDeDescarga.href = URL.createObjectURL(blob);
+
+  enlaceDeDescarga.addEventListener("click",function(){
+    URL.revokeObjectURL(this.href);
+  })
+
+  
+}
+
 async function read(entrada) {
 
 
@@ -61,6 +77,15 @@ function write(outPut, subtitles) {
   }
 
 
+}
+function unParseSRT(subtitles) {
+  let unParsedSRT = "";
+  for (let i = 0; i < subtitles.length; i++) {
+
+    unParsedSRT += (i + 1) + "\n" + subtitles[i].inicio + " --> " + subtitles[i].final + "\n" + subtitles[i].contenido + "\n\n";
+
+  }
+  return unParsedSRT;
 }
 
 function parseSRT(stringFichero, subtitles) {
@@ -146,6 +171,10 @@ function merge() {
   }
 
   write(thirdOutPut, subtitlesC);
+
+  download(unParseSRT(subtitlesC), "resultado.srt", "text/plain");
+  
+
 }
 
 function addPersistence(subtitles) {
@@ -156,7 +185,7 @@ function addPersistence(subtitles) {
     let timeStampInicioDate = toDate(subtitles[i + 1].inicio);
 
     if (timeStampInicioDate - timeStampFinalDate > persistenceTime) {
-      timeStampFinalDate.setSeconds(timeStampFinalDate.getSeconds() + (persistenceTime/1000));
+      timeStampFinalDate.setSeconds(timeStampFinalDate.getSeconds() + (persistenceTime / 1000));
 
       let stringHours = timeStampFinalDate.getHours().toString().length == 2 ? "" + timeStampFinalDate.getHours() : "0" + timeStampFinalDate.getHours();
       let stringMinutes = timeStampFinalDate.getMinutes().toString().length == 2 ? "" + timeStampFinalDate.getMinutes() : "0" + timeStampFinalDate.getMinutes();
@@ -223,12 +252,9 @@ document.getElementById("persistenceCheckBox")
   .addEventListener("change", function () {
     if (this.checked) {
       document.getElementById("persistenceSeconds").disabled = false;
-
-
     }
     else {
       document.getElementById("persistenceSeconds").disabled = true;
-
 
     }
 
