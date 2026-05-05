@@ -32,22 +32,6 @@ function Subtitle(inicio, final, contenido) {
   this.contenido = contenido;
 }
 
-function download(data, filename) {
-
-  let enlaceDeDescarga = document.getElementById("descarga");
-  enlaceDeDescarga.download = filename;
-  enlaceDeDescarga.hidden = false;
-
-  let blob = new Blob([data], { type: 'text/plain' });
-  enlaceDeDescarga.href = URL.createObjectURL(blob);
-
-  enlaceDeDescarga.addEventListener("click",function(){
-    URL.revokeObjectURL(this.href);
-  })
-
-  
-}
-
 async function read(entrada) {
 
 
@@ -65,27 +49,6 @@ async function read(entrada) {
 
 
   return await promesaDefichero;
-}
-
-function write(outPut, subtitles) {
-
-  outPut.textContent = "";
-  for (let i = 0; i < subtitles.length; i++) {
-
-    outPut.textContent += (i + 1) + "\n" + subtitles[i].inicio + " --> " + subtitles[i].final + "\n" + subtitles[i].contenido + "\n\n";
-
-  }
-
-
-}
-function unParseSRT(subtitles) {
-  let unParsedSRT = "";
-  for (let i = 0; i < subtitles.length; i++) {
-
-    unParsedSRT += (i + 1) + "\n" + subtitles[i].inicio + " --> " + subtitles[i].final + "\n" + subtitles[i].contenido + "\n\n";
-
-  }
-  return unParsedSRT;
 }
 
 function parseSRT(stringFichero, subtitles) {
@@ -111,8 +74,16 @@ function parseSRT(stringFichero, subtitles) {
 
 }
 
-function toDate(timeStamp) {
-  return new Date(Date.parse("2012-01-01T" + timeStamp.replace(",", ".")));
+function write(outPut, subtitles) {
+
+  outPut.textContent = "";
+  for (let i = 0; i < subtitles.length; i++) {
+
+    outPut.textContent += (i + 1) + "\n" + subtitles[i].inicio + " --> " + subtitles[i].final + "\n" + subtitles[i].contenido + "\n\n";
+
+  }
+
+
 }
 
 function merge() {
@@ -175,6 +146,36 @@ function merge() {
   download(unParseSRT(subtitlesC), "resultado.srt", "text/plain");
   
 
+}
+
+function toDate(timeStamp) {
+  return new Date(Date.parse("2012-01-01T" + timeStamp.replace(",", ".")));
+}
+
+function download(data, filename) {
+
+  let enlaceDeDescarga = document.getElementById("descarga");
+  enlaceDeDescarga.download = filename;
+  enlaceDeDescarga.hidden = false;
+
+  let blob = new Blob([data], { type: 'text/plain' });
+  enlaceDeDescarga.href = URL.createObjectURL(blob);
+
+  enlaceDeDescarga.addEventListener("click",function(){
+    URL.revokeObjectURL(this.href);
+  })
+
+  
+}
+
+function unParseSRT(subtitles) {
+  let unParsedSRT = "";
+  for (let i = 0; i < subtitles.length; i++) {
+
+    unParsedSRT += (i + 1) + "\n" + subtitles[i].inicio + " --> " + subtitles[i].final + "\n" + subtitles[i].contenido + "\n\n";
+
+  }
+  return unParsedSRT;
 }
 
 function addPersistence(subtitles) {
