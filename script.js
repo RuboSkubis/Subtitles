@@ -1,56 +1,51 @@
-let regexp = /\d\d.\d\d.\d\d.\d\d\d\s...\s\d\d.\d\d.\d\d.\d\d\d/g;
-let regExpInicio = /\d{2}:\d{2}:\d{2},\d{3}./;
-let regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
-let regExpContenido = /\s.+\s.*\s\s*/g;
+const regExpInicio = /\d{2}:\d{2}:\d{2},\d{3}./;
+const regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
 
 let firstOutPut = document.getElementById('output');
 let secondOutPut = document.getElementById("secOutPut");
 let thirdOutPut = document.getElementById('thirdOutPut');
-let forthOutPut = document.getElementById("forthOutPut");
-
-
 
 let subtitlesA = [];
 let subtitlesB = [];
 let subtitlesC = [];
 
+
 // function write(a, b, c, d, fichero) {
 //   a.textContent = fichero;
-
-//   marcasDeInicio = fichero.match(regExpInicio);
+//   let regExpInicioTodas = /\d{2}:\d{2}:\d{2},\d{3}./g;
+//   let regExpFinalTodas = /.\d{2}:\d{2}:\d{2},\d{3}/g;
+//   marcasDeInicio = fichero.match(regExpInicioTodas);
 //   let textoPre = marcasDeInicio.map((item) => item.trim()).join("\n\n");
 //   b.textContent = textoPre;
 
-//   marcasDeFinal = fichero.match(regExpFinal);
+//   marcasDeFinal = fichero.match(regExpFinalTodas);
 //   textoPre = marcasDeFinal.map((item) => item.trim()).join("\n\n");
 //   c.textContent = textoPre;
 // }
 
+//Objeto que modela el subtítulo SRT
 function Subtitle(inicio, final, contenido) {
   this.inicio = inicio;
   this.final = final;
   this.contenido = contenido;
 }
-
+//Parámetro: <input type="file">
+//Funcionamiento: Devuelve una promesa cuyo resultado es el contenido del fichero srt en una variable string
 async function read(entrada) {
-
-
   let promesaDefichero = new Promise(function (resolve) {
     let fr = new FileReader();
 
-
     fr.onload = function () {
       resolve(fr.result);
-
     }
 
     fr.readAsBinaryString(entrada.files[0]);
   });
 
-
   return await promesaDefichero;
 }
-
+//Parámetros: contenido del fichero en variable string y array vacío donde se meterán "objetos subtitulo SRT" (objeto Subtitle)
+//Funcionamiento: mete en el array "subtitles" objetos "Subtitle" basándose en los subtítulos presentes en el fichero SRT
 function parseSRT(stringFichero, subtitles) {
   let arrayStringFichero = stringFichero.split("\n");
 
@@ -73,7 +68,9 @@ function parseSRT(stringFichero, subtitles) {
 
 
 }
-
+//Parámetros: elemento HTML donde imprimir contenido para comparaciones y array de objetos "Subtitle"
+//Funcionamiento: (se presupone outPut = etiqueta <pre>)imprime en output lo que se imprimiría en el fichero SRT basándose
+//en un array de objetos "Subtitle"
 function write(outPut, subtitles) {
 
   outPut.textContent = "";
@@ -144,7 +141,7 @@ function merge() {
   write(thirdOutPut, subtitlesC);
 
   download(unParseSRT(subtitlesC), "resultado.srt", "text/plain");
-  
+
 
 }
 
@@ -161,11 +158,11 @@ function download(data, filename) {
   let blob = new Blob([data], { type: 'text/plain' });
   enlaceDeDescarga.href = URL.createObjectURL(blob);
 
-  enlaceDeDescarga.addEventListener("click",function(){
+  enlaceDeDescarga.addEventListener("click", function () {
     URL.revokeObjectURL(this.href);
   })
 
-  
+
 }
 
 function unParseSRT(subtitles) {
