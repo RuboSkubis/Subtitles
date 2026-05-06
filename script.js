@@ -210,6 +210,82 @@ function addPersistence(subtitles) {
     }
   }
 }
+
+function altMerge(subtitlesA, subtitlesB) {
+  let subtitlesC = [];
+
+  for (let i = 0, j = 0; i < subtitlesA.length && j < subtitlesB.length;) {
+    let subtitleAuxEarly = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesB[j] : subtitlesA[i];
+    let subtitleAuxLate = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesA[i] : subtitlesB[j];
+    //OK
+    if (subtitleAuxEarly.inicio == subtitleAuxLate.inicio && subtitleAuxEarly.final == subtitleAuxLate.final) {
+      subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+      i++;
+      j++;
+    }
+    //OK
+    else if (subtitleAuxEarly.inicio == subtitleAuxLate.inicio) {
+      if (subtitleAuxEarly.final < subtitleAuxLate.final) {
+        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+        subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitleAuxLate.final, "-\n" + subtitleAuxLate.contenido));
+      }
+      else {
+        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+        subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, subtitleAuxEarly + "\n-"));
+      }
+      i++;
+      j++;
+
+
+    }
+
+    else if (subtitleAuxEarly.final < subtitleAuxLate.inicio) {
+      
+      if (subtitleAuxEarly == subtitlesA[i]) {
+
+        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
+        i++;
+      }
+      else if (subtitleAuxEarly == subtitlesB[j]) {
+
+        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, "-\n" + subtitleAuxEarly.contenido));
+        j++;
+      }
+
+
+
+    }
+    else {
+
+      if (subtitleAuxEarly == subtitlesA[i]) {
+        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, subtitleAuxEarly.contenido + "\n-"));
+        
+        if (subtitleAuxLate.final < subtitleAuxEarly.final) {
+          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxLate.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+        }
+        else {
+          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+        }
+        subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
+      }
+
+      else if(subtitleAuxEarly ==subtitlesB[j]) {
+        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, "-\n" + subtitleAuxEarly.contenido));
+         
+        if (subtitleAuxLate.final < subtitleAuxEarly.final) {
+          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxLate.final, subtitleAuxLate.contenido + "\n" + subtitleAuxEarly.contenido));
+        }
+        else {
+          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxLate.contenido + "\n" + subtitleAuxEarly.contenido));
+        }
+        subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, "-\n" + subtitleAuxEarly.contenido));
+      }
+      i++;
+      j++;
+    }
+  }
+  return subtitlesC;
+}
 document.getElementById('inputfile')
   .addEventListener('change', function () {
     let promesaDefichero = read(this);
@@ -218,6 +294,14 @@ document.getElementById('inputfile')
       function (result) {
         subtitlesA = parseSRT(result);
         write(firstOutPut, subtitlesA);
+        for (let i = 0; i < subtitlesA.length; i++) {
+
+          if (i > 0) {
+            if (toDate(subtitlesA[i].inicio).getSeconds() == toDate(subtitlesA[i - 1].inicio).getSeconds() && toDate(subtitlesA[i].inicio).getMinutes() == toDate(subtitlesA[i - 1].inicio).getMinutes()) {
+              console.log("Encontramos segundos repetidos en la posicion:" + i);
+            }
+          }
+        }
 
       }
     );
@@ -240,14 +324,18 @@ document.getElementById("mergeButton")
   .addEventListener('click', function () {
     if (subtitlesA.length != 0 && subtitlesB.length != 0) {
 
-      subtitlesC = merge(subtitlesA, subtitlesB);
+      // subtitlesC = merge(subtitlesA, subtitlesB);
 
-      if (document.getElementById("persistenceCheckBox").checked) {
-        addPersistence(subtitlesC);
-      }
+      // if (document.getElementById("persistenceCheckBox").checked) {
+      //   addPersistence(subtitlesC);
+      // }
+
+      subtitlesC = altMerge(subtitlesA, subtitlesB);
 
       write(thirdOutPut, subtitlesC);
       download(unParseSRT(subtitlesC), "resultado.srt");
+
+
     }
     else {
       alert("Tienes que meter dos ficheros.");
