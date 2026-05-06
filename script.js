@@ -197,7 +197,7 @@ function addPersistence(subtitles) {
 
     }
     else {
-      timeStampFinalDate.setMilliseconds(timeStampFinalDate.getMilliseconds() + (timeStampInicioDate - timeStampFinalDate - 1));
+      timeStampFinalDate.setMilliseconds(timeStampInicioDate.getMilliseconds() - 20);
 
       let stringHours = timeStampFinalDate.getHours().toString().length == 2 ? "" + timeStampFinalDate.getHours() : "0" + timeStampFinalDate.getHours();
       let stringMinutes = timeStampFinalDate.getMinutes().toString().length == 2 ? "" + timeStampFinalDate.getMinutes() : "0" + timeStampFinalDate.getMinutes();
