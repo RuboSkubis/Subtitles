@@ -45,9 +45,10 @@ async function read(entrada) {
   return await promesaDefichero;
 }
 //Parámetros: contenido del fichero en variable string y array vacío donde se meterán "objetos subtitulo SRT" (objeto Subtitle)
-//Funcionamiento: mete en el array "subtitles" objetos "Subtitle" basándose en los subtítulos presentes en el fichero SRT
-function parseSRT(stringFichero, subtitles) {
+//Funcionamiento: Devuelve un array de objetos "Subtitle" basándose en los subtítulos presentes en el fichero SRT
+function parseSRT(stringFichero) {
   let arrayStringFichero = stringFichero.split("\n");
+  let subtitles = [];
 
   for (let i = 1; i < arrayStringFichero.length;) {
     let inicio = arrayStringFichero[i].match(regExpInicio)[0].trim();
@@ -65,7 +66,7 @@ function parseSRT(stringFichero, subtitles) {
     }
 
   }
-
+  return subtitles;
 
 }
 //Parámetros: elemento HTML donde imprimir contenido para comparaciones y array de objetos "Subtitle"
@@ -82,9 +83,11 @@ function write(outPut, subtitles) {
 
 
 }
-
-function merge() {
+//Parámetros: dos arrays de objetos Subtitulos para fusionar
+//Funcionamiento: devuelve un array de objetos subtítulo resultado de fusionar los arrays de entrada
+function merge(subtitlesA, subtitlesB) {
   let funMode = Array.from(document.getElementsByClassName("modeButton")).find(item => item.checked == true).value;
+  let subtitlesC = [];
 
   if (funMode == "upPriority") {
     for (let i = 0; i < subtitlesA.length; i++) {
@@ -134,21 +137,17 @@ function merge() {
       subtitlesC.push(new Subtitle(inicio, final, contenido));
     }
   }
-  if (document.getElementById("persistenceCheckBox").checked) {
-    addPersistence(subtitlesC);
-  }
 
-  write(thirdOutPut, subtitlesC);
-
-  download(unParseSRT(subtitlesC), "resultado.srt", "text/plain");
-
+  return subtitlesC;
 
 }
-
+//Parámetro:timeStamp en formato "00:00:00,000" de inicio o final de un objeto Subtitle
+//Funcionamiento: devuelve un objeto Date creado a partir de un timeStamp
 function toDate(timeStamp) {
   return new Date(Date.parse("2012-01-01T" + timeStamp.replace(",", ".")));
 }
-
+//Parámtros: un string con contenido de un fichero SRT, y el nombre del fichero deseado
+//Funcionamiento: habilita enlace de descarga para descargar fichero SRT
 function download(data, filename) {
 
   let enlaceDeDescarga = document.getElementById("descarga");
@@ -164,7 +163,8 @@ function download(data, filename) {
 
 
 }
-
+//Parámetros: array de objetos Subtitle
+//Funcionamiento: devuelve un array de Subtitles como un único String en formato SRT
 function unParseSRT(subtitles) {
   let unParsedSRT = "";
   for (let i = 0; i < subtitles.length; i++) {
@@ -174,7 +174,8 @@ function unParseSRT(subtitles) {
   }
   return unParsedSRT;
 }
-
+// Parámetros:array de objetos Subtitle
+//Funcionamiento:añade persistencia al array de subtitulos que se pasa por parámetro.
 function addPersistence(subtitles) {
   let persistenceTime = Number(document.getElementById("persistenceSeconds").value) * 1000;
 
@@ -215,7 +216,7 @@ document.getElementById('inputfile')
 
     promesaDefichero.then(
       function (result) {
-        parseSRT(result, subtitlesA);
+        subtitlesA = parseSRT(result);
         write(firstOutPut, subtitlesA);
 
       }
@@ -228,7 +229,7 @@ document.getElementById('secFile')
 
     promesaDefichero.then(
       function (result) {
-        parseSRT(result, subtitlesB);
+        subtitlesB = parseSRT(result);
         write(secondOutPut, subtitlesB);
 
       }
@@ -238,7 +239,15 @@ document.getElementById('secFile')
 document.getElementById("mergeButton")
   .addEventListener('click', function () {
     if (subtitlesA.length != 0 && subtitlesB.length != 0) {
-      merge();
+
+      subtitlesC = merge(subtitlesA, subtitlesB);
+
+      if (document.getElementById("persistenceCheckBox").checked) {
+        addPersistence(subtitlesC);
+      }
+
+      write(thirdOutPut, subtitlesC);
+      download(unParseSRT(subtitlesC), "resultado.srt");
     }
     else {
       alert("Tienes que meter dos ficheros.");
