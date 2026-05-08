@@ -47,7 +47,7 @@ async function read(entrada) {
 //Parámetros: contenido del fichero en variable string y array vacío donde se meterán "objetos subtitulo SRT" (objeto Subtitle)
 //Funcionamiento: Devuelve un array de objetos "Subtitle" basándose en los subtítulos presentes en el fichero SRT
 function parseSRT(stringFichero) {
-  let arrayStringFichero = stringFichero.split("\n");
+  let arrayStringFichero = stringFichero.trim().split("\n");
   let subtitles = [];
 
   for (let i = 1; i < arrayStringFichero.length;) {
@@ -55,7 +55,7 @@ function parseSRT(stringFichero) {
     let final = arrayStringFichero[i].match(regExpFinal)[0].trim();
     let contenido = arrayStringFichero[i + 1];
 
-    if (arrayStringFichero[i + 2] == "") {
+    if (arrayStringFichero[i + 2] == "" || arrayStringFichero[i + 2] == undefined) {
       subtitles.push(new Subtitle(inicio, final, contenido));
       i += 4;
     }
@@ -66,6 +66,7 @@ function parseSRT(stringFichero) {
     }
 
   }
+  console.log(subtitles[subtitles.length - 1].contenido);
   return subtitles;
 
 }
@@ -228,10 +229,12 @@ function altMerge(subtitlesA, subtitlesB) {
       if (subtitleAuxEarly.final < subtitleAuxLate.final) {
         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
         subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitleAuxLate.final, "-\n" + subtitleAuxLate.contenido));
+
       }
       else {
         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
-        subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, subtitleAuxEarly + "\n-"));
+        subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
+
       }
       i++;
       j++;
@@ -239,8 +242,23 @@ function altMerge(subtitlesA, subtitlesB) {
 
     }
 
+    else if (subtitleAuxEarly.final == subtitleAuxLate.final) {
+      if (subtitleAuxEarly = subtitlesA[i]) {
+        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, subtitleAuxEarly.contenido + "\n-"));
+        subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+        console.log("ey1");
+      }
+      else {
+        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, "-\n" + subtitleAuxEarly.contenido));
+        subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+        console.log("ey2");
+      }
+      i++;
+      j++;
+    }
+
     else if (subtitleAuxEarly.final < subtitleAuxLate.inicio) {
-      
+
       if (subtitleAuxEarly == subtitlesA[i]) {
 
         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
@@ -259,26 +277,30 @@ function altMerge(subtitlesA, subtitlesB) {
 
       if (subtitleAuxEarly == subtitlesA[i]) {
         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, subtitleAuxEarly.contenido + "\n-"));
-        
-        if (subtitleAuxLate.final < subtitleAuxEarly.final) {
-          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxLate.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+
+        if (subtitleAuxEarly.final < subtitleAuxLate.final) {
+          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+          subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitleAuxLate.final, "-\n" + subtitleAuxLate.contenido));
         }
         else {
-          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxLate.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+          subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
         }
-        subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
+
       }
 
-      else if(subtitleAuxEarly ==subtitlesB[j]) {
+      else if (subtitleAuxEarly == subtitlesB[j]) {
         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, "-\n" + subtitleAuxEarly.contenido));
-         
-        if (subtitleAuxLate.final < subtitleAuxEarly.final) {
-          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxLate.final, subtitleAuxLate.contenido + "\n" + subtitleAuxEarly.contenido));
+
+        if (subtitleAuxEarly.final < subtitleAuxLate.final) {
+          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxLate.contenido + "\n" + subtitleAuxEarly.contenido));
+          subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitleAuxLate.final, subtitleAuxLate.contenido + "\n-"));
         }
         else {
-          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxLate.contenido + "\n" + subtitleAuxEarly.contenido));
+          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxLate.final, subtitleAuxLate.contenido + "\n" + subtitleAuxEarly.contenido));
+          subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, "-\n" + subtitleAuxEarly.contenido));
         }
-        subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, "-\n" + subtitleAuxEarly.contenido));
+
       }
       i++;
       j++;
@@ -298,7 +320,7 @@ document.getElementById('inputfile')
 
           if (i > 0) {
             if (toDate(subtitlesA[i].inicio).getSeconds() == toDate(subtitlesA[i - 1].inicio).getSeconds() && toDate(subtitlesA[i].inicio).getMinutes() == toDate(subtitlesA[i - 1].inicio).getMinutes()) {
-              console.log("Encontramos segundos repetidos en la posicion:" + i);
+
             }
           }
         }
