@@ -49,24 +49,27 @@ async function read(entrada) {
 function parseSRT(stringFichero) {
   let arrayStringFichero = stringFichero.trim().split("\n");
   let subtitles = [];
-
   for (let i = 1; i < arrayStringFichero.length;) {
+
     let inicio = arrayStringFichero[i].match(regExpInicio)[0].trim();
     let final = arrayStringFichero[i].match(regExpFinal)[0].trim();
-    let contenido = arrayStringFichero[i + 1];
+    let contenido = arrayStringFichero[i + 1].trim();
 
-    if (arrayStringFichero[i + 2] == "" || arrayStringFichero[i + 2] == undefined) {
+    if (arrayStringFichero[i + 2] == "" || arrayStringFichero[i + 2] == undefined || arrayStringFichero[i + 2] == "\r") {
       subtitles.push(new Subtitle(inicio, final, contenido));
       i += 4;
+   
+      
     }
     else {
-      contenido += " " + arrayStringFichero[i + 2];
+      contenido += " " + arrayStringFichero[i + 2].trim();
       subtitles.push(new Subtitle(inicio, final, contenido));
       i += 5;
+      
     }
 
   }
-  console.log(subtitles[subtitles.length - 1].contenido);
+
   return subtitles;
 
 }
@@ -212,19 +215,19 @@ function addPersistence(subtitles) {
   }
 }
 
-function altMerge(subtitlesA, subtitlesB) {
+function altMerge(subtitlesA, subtitlesB) {  
   let subtitlesC = [];
 
   for (let i = 0, j = 0; i < subtitlesA.length && j < subtitlesB.length;) {
     let subtitleAuxEarly = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesB[j] : subtitlesA[i];
     let subtitleAuxLate = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesA[i] : subtitlesB[j];
-    //OK
+
     if (subtitleAuxEarly.inicio == subtitleAuxLate.inicio && subtitleAuxEarly.final == subtitleAuxLate.final) {
       subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
       i++;
       j++;
     }
-    //OK
+
     else if (subtitleAuxEarly.inicio == subtitleAuxLate.inicio) {
       if (subtitleAuxEarly.final < subtitleAuxLate.final) {
         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
@@ -316,17 +319,10 @@ document.getElementById('inputfile')
       function (result) {
         subtitlesA = parseSRT(result);
         write(firstOutPut, subtitlesA);
-        for (let i = 0; i < subtitlesA.length; i++) {
-
-          if (i > 0) {
-            if (toDate(subtitlesA[i].inicio).getSeconds() == toDate(subtitlesA[i - 1].inicio).getSeconds() && toDate(subtitlesA[i].inicio).getMinutes() == toDate(subtitlesA[i - 1].inicio).getMinutes()) {
-
-            }
-          }
-        }
-
+        
       }
     );
+   
   });
 
 document.getElementById('secFile')
@@ -337,9 +333,11 @@ document.getElementById('secFile')
       function (result) {
         subtitlesB = parseSRT(result);
         write(secondOutPut, subtitlesB);
+        
 
       }
     );
+   
   });
 
 document.getElementById("mergeButton")
@@ -356,6 +354,7 @@ document.getElementById("mergeButton")
 
       write(thirdOutPut, subtitlesC);
       download(unParseSRT(subtitlesC), "resultado.srt");
+      
 
 
     }
