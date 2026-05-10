@@ -4,7 +4,8 @@ const regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
 let firstOutPut = document.getElementById('output');
 let secondOutPut = document.getElementById("secOutPut");
 let thirdOutPut = document.getElementById('thirdOutPut');
-
+//subtitlesA será el idioma superior y subtitlesB el inferior
+//subtitlesC es el array objetivo donde estará la fusión
 let subtitlesA = [];
 let subtitlesB = [];
 let subtitlesC = [];
@@ -58,14 +59,14 @@ function parseSRT(stringFichero) {
     if (arrayStringFichero[i + 2] == "" || arrayStringFichero[i + 2] == undefined || arrayStringFichero[i + 2] == "\r") {
       subtitles.push(new Subtitle(inicio, final, contenido));
       i += 4;
-   
-      
+
+
     }
     else {
       contenido += " " + arrayStringFichero[i + 2].trim();
       subtitles.push(new Subtitle(inicio, final, contenido));
       i += 5;
-      
+
     }
 
   }
@@ -215,7 +216,7 @@ function addPersistence(subtitles) {
   }
 }
 
-function altMerge(subtitlesA, subtitlesB) {  
+function altMerge2(subtitlesA, subtitlesB) {
   let subtitlesC = [];
 
   for (let i = 0, j = 0; i < subtitlesA.length && j < subtitlesB.length;) {
@@ -249,12 +250,12 @@ function altMerge(subtitlesA, subtitlesB) {
       if (subtitleAuxEarly = subtitlesA[i]) {
         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, subtitleAuxEarly.contenido + "\n-"));
         subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
-        console.log("ey1");
+
       }
       else {
         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, "-\n" + subtitleAuxEarly.contenido));
         subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
-        console.log("ey2");
+
       }
       i++;
       j++;
@@ -289,6 +290,8 @@ function altMerge(subtitlesA, subtitlesB) {
           subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxLate.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
           subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
         }
+        i++;
+        j++;
 
       }
 
@@ -298,15 +301,123 @@ function altMerge(subtitlesA, subtitlesB) {
         if (subtitleAuxEarly.final < subtitleAuxLate.final) {
           subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxLate.contenido + "\n" + subtitleAuxEarly.contenido));
           subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitleAuxLate.final, subtitleAuxLate.contenido + "\n-"));
+          i++;
+          j++;
         }
         else {
           subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxLate.final, subtitleAuxLate.contenido + "\n" + subtitleAuxEarly.contenido));
-          subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, "-\n" + subtitleAuxEarly.contenido));
+
+          console.log(i);
+          if (subtitlesA[i + 1] != undefined && (toDate(subtitlesA[i + 1].inicio) < toDate(subtitleAuxEarly.final))) {
+            subtitlesC.push(new Subtitle(subtitleAuxLate.final,subtitlesA[i+1].inicio,"\n-"+subtitleAuxEarly.contenido));
+            if (toDate(subtitlesA[i + 1].final) > toDate(subtitleAuxEarly.final)) {
+              subtitlesC.push(new Subtitle(subtitlesA[i + 1].inicio, subtitleAuxEarly.final, subtitlesA[i + 1].contenido + "\n" + subtitleAuxEarly.contenido));
+              subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitlesA[i + 1].final, subtitlesA[i + 1].contenido + "\n-"));
+            }
+            else {
+              subtitlesC.push(new Subtitle(subtitlesA[i + 1].inicio, subtitlesA[i + 1].final, subtitlesA[i + 1].contenido + "\n" + subtitleAuxEarly.contenido));
+              subtitlesC.push(new Subtitle(subtitlesA[i + 1].final, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
+            }
+            i += 2;
+            j++;
+          }
+
+          else {
+            subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, "-\n" + subtitleAuxEarly.contenido));
+            i++;
+            j++;
+          }
+
         }
 
       }
-      i++;
-      j++;
+
+    }
+  }
+  return subtitlesC;
+}
+
+function altMerge(subtitlesA, subtitlesB) {
+  let subtitlesC = [];
+
+  for (let i = 0, j = 0; i < subtitlesA.length && j < subtitlesB.length;) {
+    let subtitleEarly = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesB[j] : subtitlesA[i];
+    let subtitleLate = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesA[i] : subtitlesB[j];
+
+    if (toDate(subtitleEarly.final) < toDate(subtitleLate.inicio)) {
+      if (subtitleEarly == subtitlesA[i]) {
+        subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
+        i++;
+      }
+      else {
+        subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, "-\n" + subtitleEarly.contenido));
+        j++;
+      }
+    }
+    else {
+      if (subtitleEarly.inicio == subtitleLate.inicio && subtitleEarly.final == subtitleLate.final) {
+        subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+        i++;
+        j++;
+      }
+      else if (subtitleEarly.inicio == subtitleLate.inicio) {
+        if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
+          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+          subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, "-\n" + subtitleLate.contenido));
+        }
+        else {
+          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+          subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
+        }
+        i++;
+        j++;
+      }
+      else if (subtitleEarly.final == subtitleLate.final) {
+        if (subtitleAuxEarly = subtitlesA[i]) {
+          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, subtitleEarly.contenido + "\n-"));
+          subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+
+        }
+        else {
+          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, "-\n" + subtitleEarly.contenido));
+          subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+
+        }
+        i++;
+        j++;
+      }
+      else {
+
+        if (subtitleEarly == subtitlesA[i]) {
+          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, subtitleEarly.contenido + "\n-"));
+
+          if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
+            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+            subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, "-\n" + subtitleLate.contenido));
+          }
+          else {
+            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleLate.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+            subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
+          }
+
+        }
+
+        else if (subtitleEarly == subtitlesB[j]) {
+          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, "-\n" + subtitleEarly.contenido));
+
+          if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
+            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleLate.contenido + "\n" + subtitleEarly.contenido));
+            subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, subtitleLate.contenido + "\n-"));
+          }
+          else {
+            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleLate.final, subtitleLate.contenido + "\n" + subtitleEarly.contenido));
+            subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, "-\n" + subtitleEarly.contenido));
+          }
+
+        }
+        i++;
+        j++;
+      }
     }
   }
   return subtitlesC;
@@ -319,10 +430,10 @@ document.getElementById('inputfile')
       function (result) {
         subtitlesA = parseSRT(result);
         write(firstOutPut, subtitlesA);
-        
+
       }
     );
-   
+
   });
 
 document.getElementById('secFile')
@@ -333,11 +444,11 @@ document.getElementById('secFile')
       function (result) {
         subtitlesB = parseSRT(result);
         write(secondOutPut, subtitlesB);
-        
+
 
       }
     );
-   
+
   });
 
 document.getElementById("mergeButton")
@@ -351,10 +462,12 @@ document.getElementById("mergeButton")
       // }
 
       subtitlesC = altMerge(subtitlesA, subtitlesB);
+      // subtitlesC = altMerge2(subtitlesA, subtitlesB);
+      
 
       write(thirdOutPut, subtitlesC);
       download(unParseSRT(subtitlesC), "resultado.srt");
-      
+
 
 
     }
