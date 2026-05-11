@@ -60,6 +60,48 @@ function toMiliSeconds(timeStamp) {
 
   return ms + (seconds * 1000) + (minutes * 60 * 1000) + (hours * 60 * 60 * 1000);
 }
+function toTimeStamp(ms) {
+
+  let hora = Math.floor(ms / (60 * 60 * 1000));
+  ms = ms % (60 * 60 * 1000);
+
+  let minuto = Math.floor(ms / (60 * 1000));
+  ms = ms % (60 * 1000);
+
+  let segundo = Math.floor(ms / 1000);
+  ms = ms % 1000;
+
+  let timeStamp = "";
+
+  if (hora < 10) {
+    timeStamp += "0" + hora + ":";
+  }
+  else {
+    timeStamp += hora + ":";
+  }
+  if (minuto < 10) {
+    timeStamp += "0" + minuto + ":"
+  }
+  else {
+    timeStamp += minuto + ":";
+  }
+  if (segundo < 10) {
+    timeStamp += "0" + segundo + ",";
+  }
+  else {
+    timeStamp += segundo + ","
+  }
+  if (ms < 10) {
+    timeStamp += "00" + ms;
+  }
+  else if (ms < 100) {
+    timeStamp += "0" + ms;
+  }
+  else {
+    timeStamp += ms;
+  }
+  return timeStamp;
+}
 //Parámetros: contenido del fichero en variable string y array vacío donde se meterán "objetos subtitulo SRT" (objeto Subtitle)
 //Funcionamiento: Devuelve un array de objetos "Subtitle" basándose en los subtítulos presentes en el fichero SRT
 function parseSRT(stringFichero) {
@@ -464,7 +506,7 @@ function altMerge3(subtitlesA, subtitlesB) {
   let prevTime = eventos[0].marca;
 
   for (event of eventos) {
-    console.log("paseporaqui");
+
     if (prevTime != event.marca) {
       subtitlesC.push(new Subtitle(prevTime, event.marca, activeA + "\n" + activeB));
     }
@@ -488,7 +530,7 @@ function altMerge3(subtitlesA, subtitlesB) {
 
     prevTime = event.time
   }
-return subtitlesC;
+  return subtitlesC;
 }
 document.getElementById('inputfile')
   .addEventListener('change', function () {
@@ -529,9 +571,11 @@ document.getElementById("mergeButton")
       //   addPersistence(subtitlesC);
       // }
 
-      // subtitlesC = altMerge(subtitlesA, subtitlesB);
+      subtitlesC = altMerge(subtitlesA, subtitlesB);
+      console.log(toTimeStamp(toMiliSeconds(subtitlesC[0].inicio)));
+      console.log(toTimeStamp(toMiliSeconds(subtitlesC[subtitlesC.length - 1].inicio)));
       // subtitlesC = altMerge2(subtitlesA, subtitlesB);
-      subtitlesC = altMerge3(subtitlesA, subtitlesB);
+      // subtitlesC = altMerge3(subtitlesA, subtitlesB);
 
 
       write(thirdOutPut, subtitlesC);
