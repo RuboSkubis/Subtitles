@@ -30,6 +30,13 @@ function Subtitle(inicio, final, contenido) {
   this.final = final;
   this.contenido = contenido;
 }
+function Evento(marca, idioma, tipo, texto = undefined) {
+  this.marca = marca;
+  this.idioma = idioma;
+  this.tipo = tipo;
+  this.texto = texto;
+
+}
 //Parámetro: <input type="file">
 //Funcionamiento: Devuelve una promesa cuyo resultado es el contenido del fichero srt en una variable string
 async function read(entrada) {
@@ -44,6 +51,14 @@ async function read(entrada) {
   });
 
   return await promesaDefichero;
+}
+function toMiliSeconds(timeStamp) {
+  let ms = Number(timeStamp.match(/\d{3}/)[0]);
+  let hours = Number(timeStamp.match(/\d{2}/g)[0]);
+  let minutes = Number(timeStamp.match(/\d{2}/g)[1]);
+  let seconds = Number(timeStamp.match(/\d{2}/g)[2]);
+
+  return ms + (seconds * 1000) + (minutes * 60 * 1000) + (hours * 60 * 60 * 1000);
 }
 //Parámetros: contenido del fichero en variable string y array vacío donde se meterán "objetos subtitulo SRT" (objeto Subtitle)
 //Funcionamiento: Devuelve un array de objetos "Subtitle" basándose en los subtítulos presentes en el fichero SRT
@@ -309,7 +324,7 @@ function altMerge2(subtitlesA, subtitlesB) {
 
           console.log(i);
           if (subtitlesA[i + 1] != undefined && (toDate(subtitlesA[i + 1].inicio) < toDate(subtitleAuxEarly.final))) {
-            subtitlesC.push(new Subtitle(subtitleAuxLate.final,subtitlesA[i+1].inicio,"\n-"+subtitleAuxEarly.contenido));
+            subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitlesA[i + 1].inicio, "\n-" + subtitleAuxEarly.contenido));
             if (toDate(subtitlesA[i + 1].final) > toDate(subtitleAuxEarly.final)) {
               subtitlesC.push(new Subtitle(subtitlesA[i + 1].inicio, subtitleAuxEarly.final, subtitlesA[i + 1].contenido + "\n" + subtitleAuxEarly.contenido));
               subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitlesA[i + 1].final, subtitlesA[i + 1].contenido + "\n-"));
@@ -422,6 +437,59 @@ function altMerge(subtitlesA, subtitlesB) {
   }
   return subtitlesC;
 }
+
+function altMerge3(subtitlesA, subtitlesB) {
+  let subtitlesC = [];
+  let eventos = [];
+  let activeA = "-";
+  let activeB = "-";
+
+  for (let i = 0; i < subtitlesA.length; i++) {
+    let eventoInicio = new Evento(toMiliSeconds(subtitlesA[i].inicio), "A", "inicio", subtitlesA[i].contenido);
+    eventos.push(eventoInicio);
+    let eventoFinal = new Evento(toMiliSeconds(subtitlesA[i].final), "A", "final");
+    eventos.push(eventoFinal);
+  }
+  for (let i = 0; i < subtitlesB.length; i++) {
+    let eventoInicio = new Evento(toMiliSeconds(subtitlesB[i].inicio), "B", "inicio", subtitlesB[i].contenido);
+    eventos.push(eventoInicio);
+    let eventoFinal = new Evento(toMiliSeconds(subtitlesB[i].final), "B", "final");
+    eventos.push(eventoFinal);
+  }
+
+  eventos.sort(function (a, b) { return a.marca - b.marca; });
+
+
+
+  let prevTime = eventos[0].marca;
+
+  for (event of eventos) {
+    console.log("paseporaqui");
+    if (prevTime != event.marca) {
+      subtitlesC.push(new Subtitle(prevTime, event.marca, activeA + "\n" + activeB));
+    }
+
+    if (event.tipo == "inicio") {
+      if (event.idioma == "A") {
+        activeA = event.texto;
+      }
+      else {
+        activeB = event.texto;
+      }
+    }
+    else {
+      if (event.idioma == "A") {
+        activeA = "-";
+      }
+      else {
+        activeB = "-";
+      }
+    }
+
+    prevTime = event.time
+  }
+return subtitlesC;
+}
 document.getElementById('inputfile')
   .addEventListener('change', function () {
     let promesaDefichero = read(this);
@@ -461,9 +529,10 @@ document.getElementById("mergeButton")
       //   addPersistence(subtitlesC);
       // }
 
-      subtitlesC = altMerge(subtitlesA, subtitlesB);
+      // subtitlesC = altMerge(subtitlesA, subtitlesB);
       // subtitlesC = altMerge2(subtitlesA, subtitlesB);
-      
+      subtitlesC = altMerge3(subtitlesA, subtitlesB);
+
 
       write(thirdOutPut, subtitlesC);
       download(unParseSRT(subtitlesC), "resultado.srt");
