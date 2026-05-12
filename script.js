@@ -1,6 +1,6 @@
 const regExpInicio = /\d{2}:\d{2}:\d{2},\d{3}./;
 const regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
-
+const regExpEspecial = /[^.]?-[^.]?/;
 let firstOutPut = document.getElementById('output');
 let secondOutPut = document.getElementById("secOutPut");
 let thirdOutPut = document.getElementById('thirdOutPut');
@@ -9,7 +9,6 @@ let thirdOutPut = document.getElementById('thirdOutPut');
 let subtitlesA = [];
 let subtitlesB = [];
 let subtitlesC = [];
-
 
 // function write(a, b, c, d, fichero) {
 //   a.textContent = fichero;
@@ -23,13 +22,282 @@ let subtitlesC = [];
 //   textoPre = marcasDeFinal.map((item) => item.trim()).join("\n\n");
 //   c.textContent = textoPre;
 // }
+// function merge(subtitlesA, subtitlesB) {
+//   let funMode = Array.from(document.getElementsByClassName("modeButton")).find(item => item.checked == true).value;
+//   let subtitlesC = [];
 
-//Objeto que modela el subtítulo SRT
+//   if (funMode == "upPriority") {
+//     for (let i = 0; i < subtitlesA.length; i++) {
+//       let inicio = subtitlesA[i].inicio;
+//       let final = subtitlesA[i].final;
+//       let contenido = subtitlesA[i].contenido + "\n" + subtitlesB[i].contenido;
+
+//       subtitlesC.push(new Subtitle(inicio, final, contenido));
+//     }
+//   }
+//   else if (funMode == "downPriority") {
+//     for (let i = 0; i < subtitlesA.length; i++) {
+//       let inicio = subtitlesB[i].inicio;
+//       let final = subtitlesB[i].final;
+//       let contenido = subtitlesA[i].contenido + "\n" + subtitlesB[i].contenido;
+
+//       subtitlesC.push(new Subtitle(inicio, final, contenido));
+//     }
+//   }
+//   else if (funMode == "maxTime") {
+//     for (let i = 0; i < subtitlesA.length; i++) {
+//       let timeStampADate = toDate(subtitlesA[i].inicio);
+//       let timeStampBDate = toDate(subtitlesB[i].inicio);
+//       let inicio = timeStampADate < timeStampBDate ? subtitlesA[i].inicio : subtitlesB[i].inicio;
+
+//       timeStampADate = toDate(subtitlesA[i].final);
+//       timeStampBDate = toDate(subtitlesB[i].final);
+//       let final = timeStampADate < timeStampBDate ? subtitlesB[i].final : subtitlesA[i].final;
+
+//       let contenido = subtitlesA[i].contenido + "\n" + subtitlesB[i].contenido;
+
+//       subtitlesC.push(new Subtitle(inicio, final, contenido));
+//     }
+//   }
+//   else {
+//     for (let i = 0; i < subtitlesA.length; i++) {
+//       let timeStampADate = toDate(subtitlesA[i].inicio);
+//       let timeStampBDate = toDate(subtitlesB[i].inicio);
+//       let inicio = timeStampADate < timeStampBDate ? subtitlesB[i].inicio : subtitlesA[i].inicio;
+
+//       timeStampADate = toDate(subtitlesA[i].final);
+//       timeStampBDate = toDate(subtitlesB[i].final);
+//       let final = timeStampADate < timeStampBDate ? subtitlesA[i].final : subtitlesB[i].final;
+
+//       let contenido = subtitlesA[i].contenido + "\n" + subtitlesB[i].contenido;
+
+//       subtitlesC.push(new Subtitle(inicio, final, contenido));
+//     }
+//   }
+
+//   return subtitlesC;
+
+// }
+
+// function altMerge(subtitlesA, subtitlesB) {
+//   let subtitlesC = [];
+
+//   for (let i = 0, j = 0; i < subtitlesA.length && j < subtitlesB.length;) {
+//     let subtitleEarly = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesB[j] : subtitlesA[i];
+//     let subtitleLate = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesA[i] : subtitlesB[j];
+
+//     if (toDate(subtitleEarly.final) < toDate(subtitleLate.inicio)) {
+//       if (subtitleEarly == subtitlesA[i]) {
+//         subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
+//         i++;
+//       }
+//       else {
+//         subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, "-\n" + subtitleEarly.contenido));
+//         j++;
+//       }
+//     }
+//     else {
+//       if (subtitleEarly.inicio == subtitleLate.inicio && subtitleEarly.final == subtitleLate.final) {
+//         subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+//         i++;
+//         j++;
+//       }
+//       else if (subtitleEarly.inicio == subtitleLate.inicio) {
+//         if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
+//           subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+//           subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, "-\n" + subtitleLate.contenido));
+//         }
+//         else {
+//           subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+//           subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
+//         }
+//         i++;
+//         j++;
+//       }
+//       else if (subtitleEarly.final == subtitleLate.final) {
+//         if (subtitleAuxEarly = subtitlesA[i]) {
+//           subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, subtitleEarly.contenido + "\n-"));
+//           subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+
+//         }
+//         else {
+//           subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, "-\n" + subtitleEarly.contenido));
+//           subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+
+//         }
+//         i++;
+//         j++;
+//       }
+//       else {
+
+//         if (subtitleEarly == subtitlesA[i]) {
+//           subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, subtitleEarly.contenido + "\n-"));
+
+//           if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
+//             subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+//             subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, "-\n" + subtitleLate.contenido));
+//           }
+//           else {
+//             subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleLate.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+//             subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
+//           }
+
+//         }
+
+//         else if (subtitleEarly == subtitlesB[j]) {
+//           subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, "-\n" + subtitleEarly.contenido));
+
+//           if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
+//             subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleLate.contenido + "\n" + subtitleEarly.contenido));
+//             subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, subtitleLate.contenido + "\n-"));
+//           }
+//           else {
+//             subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleLate.final, subtitleLate.contenido + "\n" + subtitleEarly.contenido));
+//             subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, "-\n" + subtitleEarly.contenido));
+//           }
+
+//         }
+//         i++;
+//         j++;
+//       }
+//     }
+//   }
+//   return subtitlesC;
+// }
+
+// function altMerge2(subtitlesA, subtitlesB) {
+//   let subtitlesC = [];
+
+//   for (let i = 0, j = 0; i < subtitlesA.length && j < subtitlesB.length;) {
+//     let subtitleAuxEarly = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesB[j] : subtitlesA[i];
+//     let subtitleAuxLate = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesA[i] : subtitlesB[j];
+
+//     if (subtitleAuxEarly.inicio == subtitleAuxLate.inicio && subtitleAuxEarly.final == subtitleAuxLate.final) {
+//       subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+//       i++;
+//       j++;
+//     }
+
+//     else if (subtitleAuxEarly.inicio == subtitleAuxLate.inicio) {
+//       if (subtitleAuxEarly.final < subtitleAuxLate.final) {
+//         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+//         subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitleAuxLate.final, "-\n" + subtitleAuxLate.contenido));
+
+//       }
+//       else {
+//         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+//         subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
+
+//       }
+//       i++;
+//       j++;
+
+
+//     }
+
+//     else if (subtitleAuxEarly.final == subtitleAuxLate.final) {
+//       if (subtitleAuxEarly = subtitlesA[i]) {
+//         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, subtitleAuxEarly.contenido + "\n-"));
+//         subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+
+//       }
+//       else {
+//         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, "-\n" + subtitleAuxEarly.contenido));
+//         subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+
+//       }
+//       i++;
+//       j++;
+//     }
+
+//     else if (subtitleAuxEarly.final < subtitleAuxLate.inicio) {
+
+//       if (subtitleAuxEarly == subtitlesA[i]) {
+
+//         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
+//         i++;
+//       }
+//       else if (subtitleAuxEarly == subtitlesB[j]) {
+
+//         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, "-\n" + subtitleAuxEarly.contenido));
+//         j++;
+//       }
+
+
+
+//     }
+//     else {
+
+//       if (subtitleAuxEarly == subtitlesA[i]) {
+//         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, subtitleAuxEarly.contenido + "\n-"));
+
+//         if (subtitleAuxEarly.final < subtitleAuxLate.final) {
+//           subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+//           subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitleAuxLate.final, "-\n" + subtitleAuxLate.contenido));
+//         }
+//         else {
+//           subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxLate.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
+//           subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
+//         }
+//         i++;
+//         j++;
+
+//       }
+
+//       else if (subtitleAuxEarly == subtitlesB[j]) {
+//         subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, "-\n" + subtitleAuxEarly.contenido));
+
+//         if (subtitleAuxEarly.final < subtitleAuxLate.final) {
+//           subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxLate.contenido + "\n" + subtitleAuxEarly.contenido));
+//           subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitleAuxLate.final, subtitleAuxLate.contenido + "\n-"));
+//           i++;
+//           j++;
+//         }
+//         else {
+//           subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxLate.final, subtitleAuxLate.contenido + "\n" + subtitleAuxEarly.contenido));
+
+//           console.log(i);
+//           if (subtitlesA[i + 1] != undefined && (toDate(subtitlesA[i + 1].inicio) < toDate(subtitleAuxEarly.final))) {
+//             subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitlesA[i + 1].inicio, "\n-" + subtitleAuxEarly.contenido));
+//             if (toDate(subtitlesA[i + 1].final) > toDate(subtitleAuxEarly.final)) {
+//               subtitlesC.push(new Subtitle(subtitlesA[i + 1].inicio, subtitleAuxEarly.final, subtitlesA[i + 1].contenido + "\n" + subtitleAuxEarly.contenido));
+//               subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitlesA[i + 1].final, subtitlesA[i + 1].contenido + "\n-"));
+//             }
+//             else {
+//               subtitlesC.push(new Subtitle(subtitlesA[i + 1].inicio, subtitlesA[i + 1].final, subtitlesA[i + 1].contenido + "\n" + subtitleAuxEarly.contenido));
+//               subtitlesC.push(new Subtitle(subtitlesA[i + 1].final, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
+//             }
+//             i += 2;
+//             j++;
+//           }
+
+//           else {
+//             subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, "-\n" + subtitleAuxEarly.contenido));
+//             i++;
+//             j++;
+//           }
+
+//         }
+
+//       }
+
+//     }
+//   }
+//   return subtitlesC;
+// }
+//Parámetro:timeStamp en formato "00:00:00,000" de inicio o final de un objeto Subtitle
+//Funcionamiento: devuelve un objeto Date creado a partir de un timeStamp
+// function toDate(timeStamp) {
+//   return new Date(Date.parse("2012-01-01T" + timeStamp.replace(",", ".")));
+// }
+
+/*//Objeto que modela el subtítulo SRT*/
 function Subtitle(inicio, final, contenido) {
   this.inicio = inicio;
   this.final = final;
   this.contenido = contenido;
 }
+//Objeto que modela el evento inicio o final
 function Evento(marca, idioma, tipo, texto = undefined) {
   this.marca = marca;
   this.idioma = idioma;
@@ -52,6 +320,8 @@ async function read(entrada) {
 
   return await promesaDefichero;
 }
+//Parámetro: cadena en formato XX:XX:XX,XXX (timestamp)
+//Funcionamiento: devuelve la cantidad de milisegundos correspondiente al timestamp
 function toMiliSeconds(timeStamp) {
   let ms = Number(timeStamp.match(/\d{3}/)[0]);
   let hours = Number(timeStamp.match(/\d{2}/g)[0]);
@@ -60,6 +330,8 @@ function toMiliSeconds(timeStamp) {
 
   return ms + (seconds * 1000) + (minutes * 60 * 1000) + (hours * 60 * 60 * 1000);
 }
+//Parámetro: entero que representa una cantidad de milisegundos
+//Funcionamiento: devuelve cadena en formato XX:XX:XX,XXX (timestamp)
 function toTimeStamp(ms) {
 
   let hora = Math.floor(ms / (60 * 60 * 1000));
@@ -109,8 +381,8 @@ function parseSRT(stringFichero) {
   let subtitles = [];
   for (let i = 1; i < arrayStringFichero.length;) {
 
-    let inicio = arrayStringFichero[i].match(regExpInicio)[0].trim();
-    let final = arrayStringFichero[i].match(regExpFinal)[0].trim();
+    let inicio = toMiliSeconds(arrayStringFichero[i].match(regExpInicio)[0].trim());
+    let final = toMiliSeconds(arrayStringFichero[i].match(regExpFinal)[0].trim());
     let contenido = arrayStringFichero[i + 1].trim();
 
     if (arrayStringFichero[i + 2] == "" || arrayStringFichero[i + 2] == undefined || arrayStringFichero[i + 2] == "\r") {
@@ -131,6 +403,17 @@ function parseSRT(stringFichero) {
   return subtitles;
 
 }
+//Parámetros: array de objetos Subtitle
+//Funcionamiento: devuelve un array de Subtitles como un único String en formato SRT
+function unParseSRT(subtitles) {
+  let unParsedSRT = "";
+  for (let i = 0; i < subtitles.length; i++) {
+
+    unParsedSRT += (i + 1) + "\n" + toTimeStamp(subtitles[i].inicio) + " --> " + toTimeStamp(subtitles[i].final) + "\n" + subtitles[i].contenido + "\n\n";
+
+  }
+  return unParsedSRT;
+}
 //Parámetros: elemento HTML donde imprimir contenido para comparaciones y array de objetos "Subtitle"
 //Funcionamiento: (se presupone outPut = etiqueta <pre>)imprime en output lo que se imprimiría en el fichero SRT basándose
 //en un array de objetos "Subtitle"
@@ -139,7 +422,7 @@ function write(outPut, subtitles) {
   outPut.textContent = "";
   for (let i = 0; i < subtitles.length; i++) {
 
-    outPut.textContent += (i + 1) + "\n" + subtitles[i].inicio + " --> " + subtitles[i].final + "\n" + subtitles[i].contenido + "\n\n";
+    outPut.textContent += (i + 1) + "\n" + toTimeStamp(subtitles[i].inicio) + " --> " + toTimeStamp(subtitles[i].final) + "\n" + subtitles[i].contenido + "\n\n";
 
   }
 
@@ -147,273 +430,58 @@ function write(outPut, subtitles) {
 }
 //Parámetros: dos arrays de objetos Subtitulos para fusionar
 //Funcionamiento: devuelve un array de objetos subtítulo resultado de fusionar los arrays de entrada
-function merge(subtitlesA, subtitlesB) {
-  let funMode = Array.from(document.getElementsByClassName("modeButton")).find(item => item.checked == true).value;
+function eventMerge(subtitlesA, subtitlesB) {
   let subtitlesC = [];
+  let eventos = [];
+  let activeA = "";
+  let activeB = "";
 
-  if (funMode == "upPriority") {
-    for (let i = 0; i < subtitlesA.length; i++) {
-      let inicio = subtitlesA[i].inicio;
-      let final = subtitlesA[i].final;
-      let contenido = subtitlesA[i].contenido + "\n" + subtitlesB[i].contenido;
-
-      subtitlesC.push(new Subtitle(inicio, final, contenido));
-    }
+  for (let i = 0; i < subtitlesA.length; i++) {
+    let eventoInicio = new Evento(subtitlesA[i].inicio, "A", "inicio", subtitlesA[i].contenido);
+    eventos.push(eventoInicio);
+    let eventoFinal = new Evento(subtitlesA[i].final, "A", "final");
+    eventos.push(eventoFinal);
   }
-  else if (funMode == "downPriority") {
-    for (let i = 0; i < subtitlesA.length; i++) {
-      let inicio = subtitlesB[i].inicio;
-      let final = subtitlesB[i].final;
-      let contenido = subtitlesA[i].contenido + "\n" + subtitlesB[i].contenido;
-
-      subtitlesC.push(new Subtitle(inicio, final, contenido));
-    }
-  }
-  else if (funMode == "maxTime") {
-    for (let i = 0; i < subtitlesA.length; i++) {
-      let timeStampADate = toDate(subtitlesA[i].inicio);
-      let timeStampBDate = toDate(subtitlesB[i].inicio);
-      let inicio = timeStampADate < timeStampBDate ? subtitlesA[i].inicio : subtitlesB[i].inicio;
-
-      timeStampADate = toDate(subtitlesA[i].final);
-      timeStampBDate = toDate(subtitlesB[i].final);
-      let final = timeStampADate < timeStampBDate ? subtitlesB[i].final : subtitlesA[i].final;
-
-      let contenido = subtitlesA[i].contenido + "\n" + subtitlesB[i].contenido;
-
-      subtitlesC.push(new Subtitle(inicio, final, contenido));
-    }
-  }
-  else {
-    for (let i = 0; i < subtitlesA.length; i++) {
-      let timeStampADate = toDate(subtitlesA[i].inicio);
-      let timeStampBDate = toDate(subtitlesB[i].inicio);
-      let inicio = timeStampADate < timeStampBDate ? subtitlesB[i].inicio : subtitlesA[i].inicio;
-
-      timeStampADate = toDate(subtitlesA[i].final);
-      timeStampBDate = toDate(subtitlesB[i].final);
-      let final = timeStampADate < timeStampBDate ? subtitlesA[i].final : subtitlesB[i].final;
-
-      let contenido = subtitlesA[i].contenido + "\n" + subtitlesB[i].contenido;
-
-      subtitlesC.push(new Subtitle(inicio, final, contenido));
-    }
+  for (let i = 0; i < subtitlesB.length; i++) {
+    let eventoInicio = new Evento(subtitlesB[i].inicio, "B", "inicio", subtitlesB[i].contenido);
+    eventos.push(eventoInicio);
+    let eventoFinal = new Evento(subtitlesB[i].final, "B", "final");
+    eventos.push(eventoFinal);
   }
 
-  return subtitlesC;
+  eventos.sort(function (a, b) { return a.marca - b.marca; });
 
-}
+  let prevTime = eventos[0].marca;
 
-function altMerge(subtitlesA, subtitlesB) {
-  let subtitlesC = [];
+  for (event of eventos) {
 
-  for (let i = 0, j = 0; i < subtitlesA.length && j < subtitlesB.length;) {
-    let subtitleEarly = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesB[j] : subtitlesA[i];
-    let subtitleLate = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesA[i] : subtitlesB[j];
+    if (prevTime != event.marca) {
+      if (!(activeA == "" && activeB == "")) {
+        subtitlesC.push(new Subtitle(prevTime, event.marca, activeA + "\n" + activeB));
+      }
 
-    if (toDate(subtitleEarly.final) < toDate(subtitleLate.inicio)) {
-      if (subtitleEarly == subtitlesA[i]) {
-        subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
-        i++;
+    }
+
+    if (event.tipo == "inicio") {
+      if (event.idioma == "A") {
+        activeA = event.texto;
       }
       else {
-        subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, "-\n" + subtitleEarly.contenido));
-        j++;
+        activeB = event.texto;
       }
     }
     else {
-      if (subtitleEarly.inicio == subtitleLate.inicio && subtitleEarly.final == subtitleLate.final) {
-        subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
-        i++;
-        j++;
-      }
-      else if (subtitleEarly.inicio == subtitleLate.inicio) {
-        if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
-          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
-          subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, "-\n" + subtitleLate.contenido));
-        }
-        else {
-          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
-          subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
-        }
-        i++;
-        j++;
-      }
-      else if (subtitleEarly.final == subtitleLate.final) {
-        if (subtitleAuxEarly = subtitlesA[i]) {
-          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, subtitleEarly.contenido + "\n-"));
-          subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
-
-        }
-        else {
-          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, "-\n" + subtitleEarly.contenido));
-          subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
-
-        }
-        i++;
-        j++;
+      if (event.idioma == "A") {
+        activeA = "";
       }
       else {
-
-        if (subtitleEarly == subtitlesA[i]) {
-          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, subtitleEarly.contenido + "\n-"));
-
-          if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
-            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
-            subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, "-\n" + subtitleLate.contenido));
-          }
-          else {
-            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleLate.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
-            subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
-          }
-
-        }
-
-        else if (subtitleEarly == subtitlesB[j]) {
-          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, "-\n" + subtitleEarly.contenido));
-
-          if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
-            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleLate.contenido + "\n" + subtitleEarly.contenido));
-            subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, subtitleLate.contenido + "\n-"));
-          }
-          else {
-            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleLate.final, subtitleLate.contenido + "\n" + subtitleEarly.contenido));
-            subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, "-\n" + subtitleEarly.contenido));
-          }
-
-        }
-        i++;
-        j++;
+        activeB = "";
       }
     }
+
+    prevTime = event.marca;
   }
   return subtitlesC;
-}
-
-function altMerge2(subtitlesA, subtitlesB) {
-  let subtitlesC = [];
-
-  for (let i = 0, j = 0; i < subtitlesA.length && j < subtitlesB.length;) {
-    let subtitleAuxEarly = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesB[j] : subtitlesA[i];
-    let subtitleAuxLate = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesA[i] : subtitlesB[j];
-
-    if (subtitleAuxEarly.inicio == subtitleAuxLate.inicio && subtitleAuxEarly.final == subtitleAuxLate.final) {
-      subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
-      i++;
-      j++;
-    }
-
-    else if (subtitleAuxEarly.inicio == subtitleAuxLate.inicio) {
-      if (subtitleAuxEarly.final < subtitleAuxLate.final) {
-        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
-        subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitleAuxLate.final, "-\n" + subtitleAuxLate.contenido));
-
-      }
-      else {
-        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
-        subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
-
-      }
-      i++;
-      j++;
-
-
-    }
-
-    else if (subtitleAuxEarly.final == subtitleAuxLate.final) {
-      if (subtitleAuxEarly = subtitlesA[i]) {
-        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, subtitleAuxEarly.contenido + "\n-"));
-        subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
-
-      }
-      else {
-        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, "-\n" + subtitleAuxEarly.contenido));
-        subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
-
-      }
-      i++;
-      j++;
-    }
-
-    else if (subtitleAuxEarly.final < subtitleAuxLate.inicio) {
-
-      if (subtitleAuxEarly == subtitlesA[i]) {
-
-        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
-        i++;
-      }
-      else if (subtitleAuxEarly == subtitlesB[j]) {
-
-        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxEarly.final, "-\n" + subtitleAuxEarly.contenido));
-        j++;
-      }
-
-
-
-    }
-    else {
-
-      if (subtitleAuxEarly == subtitlesA[i]) {
-        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, subtitleAuxEarly.contenido + "\n-"));
-
-        if (subtitleAuxEarly.final < subtitleAuxLate.final) {
-          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
-          subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitleAuxLate.final, "-\n" + subtitleAuxLate.contenido));
-        }
-        else {
-          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxLate.final, subtitleAuxEarly.contenido + "\n" + subtitleAuxLate.contenido));
-          subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
-        }
-        i++;
-        j++;
-
-      }
-
-      else if (subtitleAuxEarly == subtitlesB[j]) {
-        subtitlesC.push(new Subtitle(subtitleAuxEarly.inicio, subtitleAuxLate.inicio, "-\n" + subtitleAuxEarly.contenido));
-
-        if (subtitleAuxEarly.final < subtitleAuxLate.final) {
-          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxEarly.final, subtitleAuxLate.contenido + "\n" + subtitleAuxEarly.contenido));
-          subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitleAuxLate.final, subtitleAuxLate.contenido + "\n-"));
-          i++;
-          j++;
-        }
-        else {
-          subtitlesC.push(new Subtitle(subtitleAuxLate.inicio, subtitleAuxLate.final, subtitleAuxLate.contenido + "\n" + subtitleAuxEarly.contenido));
-
-          console.log(i);
-          if (subtitlesA[i + 1] != undefined && (toDate(subtitlesA[i + 1].inicio) < toDate(subtitleAuxEarly.final))) {
-            subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitlesA[i + 1].inicio, "\n-" + subtitleAuxEarly.contenido));
-            if (toDate(subtitlesA[i + 1].final) > toDate(subtitleAuxEarly.final)) {
-              subtitlesC.push(new Subtitle(subtitlesA[i + 1].inicio, subtitleAuxEarly.final, subtitlesA[i + 1].contenido + "\n" + subtitleAuxEarly.contenido));
-              subtitlesC.push(new Subtitle(subtitleAuxEarly.final, subtitlesA[i + 1].final, subtitlesA[i + 1].contenido + "\n-"));
-            }
-            else {
-              subtitlesC.push(new Subtitle(subtitlesA[i + 1].inicio, subtitlesA[i + 1].final, subtitlesA[i + 1].contenido + "\n" + subtitleAuxEarly.contenido));
-              subtitlesC.push(new Subtitle(subtitlesA[i + 1].final, subtitleAuxEarly.final, subtitleAuxEarly.contenido + "\n-"));
-            }
-            i += 2;
-            j++;
-          }
-
-          else {
-            subtitlesC.push(new Subtitle(subtitleAuxLate.final, subtitleAuxEarly.final, "-\n" + subtitleAuxEarly.contenido));
-            i++;
-            j++;
-          }
-
-        }
-
-      }
-
-    }
-  }
-  return subtitlesC;
-}
-//Parámetro:timeStamp en formato "00:00:00,000" de inicio o final de un objeto Subtitle
-//Funcionamiento: devuelve un objeto Date creado a partir de un timeStamp
-function toDate(timeStamp) {
-  return new Date(Date.parse("2012-01-01T" + timeStamp.replace(",", ".")));
 }
 //Parámtros: un string con contenido de un fichero SRT, y el nombre del fichero deseado
 //Funcionamiento: habilita enlace de descarga para descargar fichero SRT
@@ -432,111 +500,47 @@ function download(data, filename) {
 
 
 }
-//Parámetros: array de objetos Subtitle
-//Funcionamiento: devuelve un array de Subtitles como un único String en formato SRT
-function unParseSRT(subtitles) {
-  let unParsedSRT = "";
-  for (let i = 0; i < subtitles.length; i++) {
-
-    unParsedSRT += (i + 1) + "\n" + subtitles[i].inicio + " --> " + subtitles[i].final + "\n" + subtitles[i].contenido + "\n\n";
-
-  }
-  return unParsedSRT;
-}
 // Parámetros:array de objetos Subtitle
 //Funcionamiento:añade persistencia al array de subtitulos que se pasa por parámetro.
 function addPersistence(subtitles) {
   let persistenceTime = Number(document.getElementById("persistenceSeconds").value) * 1000;
 
   for (let i = 0; i < subtitles.length - 1; i++) {
-    let timeStampFinalDate = toDate(subtitles[i].final);
-    let timeStampInicioDate = toDate(subtitles[i + 1].inicio);
+    
 
-    if (timeStampInicioDate - timeStampFinalDate > persistenceTime) {
-      timeStampFinalDate.setSeconds(timeStampFinalDate.getSeconds() + (persistenceTime / 1000));
-
-      let stringHours = timeStampFinalDate.getHours().toString().length == 2 ? "" + timeStampFinalDate.getHours() : "0" + timeStampFinalDate.getHours();
-      let stringMinutes = timeStampFinalDate.getMinutes().toString().length == 2 ? "" + timeStampFinalDate.getMinutes() : "0" + timeStampFinalDate.getMinutes();
-      let stringSeconds = timeStampFinalDate.getSeconds().toString().length == 2 ? "" + timeStampFinalDate.getSeconds() : "0" + timeStampFinalDate.getSeconds();
-      let stringMilliseconds = timeStampFinalDate.getMilliseconds().toString().length == 3 ?
-        "" + timeStampFinalDate.getMilliseconds() : timeStampFinalDate.getMilliseconds().toString().length == 2 ?
-          "0" + timeStampFinalDate.getMilliseconds() : "00" + timeStampFinalDate.getMilliseconds();
-
-      subtitles[i].final = stringHours + ":" + stringMinutes + ":" + stringSeconds + "," + stringMilliseconds;
-
+    if (subtitles[i + 1].inicio - subtitles[i].final > persistenceTime) {
+      subtitles[i].final += persistenceTime;
     }
     else {
-      timeStampFinalDate.setMilliseconds(timeStampInicioDate.getMilliseconds() - 20);
-
-      let stringHours = timeStampFinalDate.getHours().toString().length == 2 ? "" + timeStampFinalDate.getHours() : "0" + timeStampFinalDate.getHours();
-      let stringMinutes = timeStampFinalDate.getMinutes().toString().length == 2 ? "" + timeStampFinalDate.getMinutes() : "0" + timeStampFinalDate.getMinutes();
-      let stringSeconds = timeStampFinalDate.getSeconds().toString().length == 2 ? "" + timeStampFinalDate.getSeconds() : "0" + timeStampFinalDate.getSeconds();
-      let stringMilliseconds = timeStampFinalDate.getMilliseconds().toString().length == 3 ?
-        "" + timeStampFinalDate.getMilliseconds() : timeStampFinalDate.getMilliseconds().toString().length == 2 ?
-          "0" + timeStampFinalDate.getMilliseconds() : "00" + timeStampFinalDate.getMilliseconds();
-
-      subtitles[i].final = stringHours + ":" + stringMinutes + ":" + stringSeconds + "," + stringMilliseconds;
+      subtitles[i].final += (subtitles[i+1].inicio-20);
     }
   }
 }
+//Parámetros: array de objetos subtitle
+//Funcionamiento: devuelve un array de objetos subtitle, pero habiendo quitado aquellos subtitulos en los que solo hay un idioma y la duracion es menor a 1 segundo
+function getSpecialSubtitles(subtitles) {
+  let specialSubtitles = subtitles.filter(function (item) {
 
-
-
-
-
-function altMerge3(subtitlesA, subtitlesB) {
-  let subtitlesC = [];
-  let eventos = [];
-  let activeA = "-";
-  let activeB = "-";
-
-  for (let i = 0; i < subtitlesA.length; i++) {
-    let eventoInicio = new Evento(toMiliSeconds(subtitlesA[i].inicio), "A", "inicio", subtitlesA[i].contenido);
-    eventos.push(eventoInicio);
-    let eventoFinal = new Evento(toMiliSeconds(subtitlesA[i].final), "A", "final");
-    eventos.push(eventoFinal);
-  }
-  for (let i = 0; i < subtitlesB.length; i++) {
-    let eventoInicio = new Evento(toMiliSeconds(subtitlesB[i].inicio), "B", "inicio", subtitlesB[i].contenido);
-    eventos.push(eventoInicio);
-    let eventoFinal = new Evento(toMiliSeconds(subtitlesB[i].final), "B", "final");
-    eventos.push(eventoFinal);
-  }
-
-  eventos.sort(function (a, b) { return a.marca - b.marca; });
-
-  let prevTime = eventos[0].marca;
-
-  for (event of eventos) {
-
-    if (prevTime != event.marca ) {
-      if(!(activeA == "-" && activeB == "-")){
-        subtitlesC.push(new Subtitle(toTimeStamp(prevTime), toTimeStamp(event.marca), activeA + "\n" + activeB));
+    if (item.contenido.match(/-/)) {
+      if (item.contenido.includes("-\n") && (item.final-item.inicio<1000)) {
+        return false;
       }
-      
-    }
-
-    if (event.tipo == "inicio") {
-      if (event.idioma == "A") {
-        activeA = event.texto;
+      else if (item.contenido.at(-2) == "\n" && (item.final-item.inicio<1000)) {
+        return false;
       }
       else {
-        activeB = event.texto;
+        return true;
       }
+
     }
     else {
-      if (event.idioma == "A") {
-        activeA = "-";
-      }
-      else {
-        activeB = "-";
-      }
+      return true;
     }
 
-    prevTime = event.marca;
-  }
-  return subtitlesC;
+  });
+  return specialSubtitles;
 }
+
 document.getElementById('inputfile')
   .addEventListener('change', function () {
     let promesaDefichero = read(this);
@@ -576,10 +580,19 @@ document.getElementById("mergeButton")
       //   addPersistence(subtitlesC);
       // }
 
+
+      subtitlesC = eventMerge(subtitlesA, subtitlesB);
+
+      // subtitlesC = getSpecialSubtitles(subtitlesC);
+
+      console.log(subtitlesC);
+      // for(subtitle of specialSubtitles){
+      //   console.log(subtitle);
+      //   console.log(subtitle.final-subtitle.inicio);
+      // }
+
+   
   
-      subtitlesC = altMerge3(subtitlesA, subtitlesB);
-
-
       write(thirdOutPut, subtitlesC);
       download(unParseSRT(subtitlesC), "resultado.srt");
 
