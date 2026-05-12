@@ -203,74 +203,91 @@ function merge(subtitlesA, subtitlesB) {
   return subtitlesC;
 
 }
-//Parámetro:timeStamp en formato "00:00:00,000" de inicio o final de un objeto Subtitle
-//Funcionamiento: devuelve un objeto Date creado a partir de un timeStamp
-function toDate(timeStamp) {
-  return new Date(Date.parse("2012-01-01T" + timeStamp.replace(",", ".")));
-}
-//Parámtros: un string con contenido de un fichero SRT, y el nombre del fichero deseado
-//Funcionamiento: habilita enlace de descarga para descargar fichero SRT
-function download(data, filename) {
 
-  let enlaceDeDescarga = document.getElementById("descarga");
-  enlaceDeDescarga.download = filename;
-  enlaceDeDescarga.hidden = false;
+function altMerge(subtitlesA, subtitlesB) {
+  let subtitlesC = [];
 
-  let blob = new Blob([data], { type: 'text/plain' });
-  enlaceDeDescarga.href = URL.createObjectURL(blob);
+  for (let i = 0, j = 0; i < subtitlesA.length && j < subtitlesB.length;) {
+    let subtitleEarly = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesB[j] : subtitlesA[i];
+    let subtitleLate = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesA[i] : subtitlesB[j];
 
-  enlaceDeDescarga.addEventListener("click", function () {
-    URL.revokeObjectURL(this.href);
-  })
-
-
-}
-//Parámetros: array de objetos Subtitle
-//Funcionamiento: devuelve un array de Subtitles como un único String en formato SRT
-function unParseSRT(subtitles) {
-  let unParsedSRT = "";
-  for (let i = 0; i < subtitles.length; i++) {
-
-    unParsedSRT += (i + 1) + "\n" + subtitles[i].inicio + " --> " + subtitles[i].final + "\n" + subtitles[i].contenido + "\n\n";
-
-  }
-  return unParsedSRT;
-}
-// Parámetros:array de objetos Subtitle
-//Funcionamiento:añade persistencia al array de subtitulos que se pasa por parámetro.
-function addPersistence(subtitles) {
-  let persistenceTime = Number(document.getElementById("persistenceSeconds").value) * 1000;
-
-  for (let i = 0; i < subtitles.length - 1; i++) {
-    let timeStampFinalDate = toDate(subtitles[i].final);
-    let timeStampInicioDate = toDate(subtitles[i + 1].inicio);
-
-    if (timeStampInicioDate - timeStampFinalDate > persistenceTime) {
-      timeStampFinalDate.setSeconds(timeStampFinalDate.getSeconds() + (persistenceTime / 1000));
-
-      let stringHours = timeStampFinalDate.getHours().toString().length == 2 ? "" + timeStampFinalDate.getHours() : "0" + timeStampFinalDate.getHours();
-      let stringMinutes = timeStampFinalDate.getMinutes().toString().length == 2 ? "" + timeStampFinalDate.getMinutes() : "0" + timeStampFinalDate.getMinutes();
-      let stringSeconds = timeStampFinalDate.getSeconds().toString().length == 2 ? "" + timeStampFinalDate.getSeconds() : "0" + timeStampFinalDate.getSeconds();
-      let stringMilliseconds = timeStampFinalDate.getMilliseconds().toString().length == 3 ?
-        "" + timeStampFinalDate.getMilliseconds() : timeStampFinalDate.getMilliseconds().toString().length == 2 ?
-          "0" + timeStampFinalDate.getMilliseconds() : "00" + timeStampFinalDate.getMilliseconds();
-
-      subtitles[i].final = stringHours + ":" + stringMinutes + ":" + stringSeconds + "," + stringMilliseconds;
-
+    if (toDate(subtitleEarly.final) < toDate(subtitleLate.inicio)) {
+      if (subtitleEarly == subtitlesA[i]) {
+        subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
+        i++;
+      }
+      else {
+        subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, "-\n" + subtitleEarly.contenido));
+        j++;
+      }
     }
     else {
-      timeStampFinalDate.setMilliseconds(timeStampInicioDate.getMilliseconds() - 20);
+      if (subtitleEarly.inicio == subtitleLate.inicio && subtitleEarly.final == subtitleLate.final) {
+        subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+        i++;
+        j++;
+      }
+      else if (subtitleEarly.inicio == subtitleLate.inicio) {
+        if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
+          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+          subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, "-\n" + subtitleLate.contenido));
+        }
+        else {
+          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+          subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
+        }
+        i++;
+        j++;
+      }
+      else if (subtitleEarly.final == subtitleLate.final) {
+        if (subtitleAuxEarly = subtitlesA[i]) {
+          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, subtitleEarly.contenido + "\n-"));
+          subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
 
-      let stringHours = timeStampFinalDate.getHours().toString().length == 2 ? "" + timeStampFinalDate.getHours() : "0" + timeStampFinalDate.getHours();
-      let stringMinutes = timeStampFinalDate.getMinutes().toString().length == 2 ? "" + timeStampFinalDate.getMinutes() : "0" + timeStampFinalDate.getMinutes();
-      let stringSeconds = timeStampFinalDate.getSeconds().toString().length == 2 ? "" + timeStampFinalDate.getSeconds() : "0" + timeStampFinalDate.getSeconds();
-      let stringMilliseconds = timeStampFinalDate.getMilliseconds().toString().length == 3 ?
-        "" + timeStampFinalDate.getMilliseconds() : timeStampFinalDate.getMilliseconds().toString().length == 2 ?
-          "0" + timeStampFinalDate.getMilliseconds() : "00" + timeStampFinalDate.getMilliseconds();
+        }
+        else {
+          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, "-\n" + subtitleEarly.contenido));
+          subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
 
-      subtitles[i].final = stringHours + ":" + stringMinutes + ":" + stringSeconds + "," + stringMilliseconds;
+        }
+        i++;
+        j++;
+      }
+      else {
+
+        if (subtitleEarly == subtitlesA[i]) {
+          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, subtitleEarly.contenido + "\n-"));
+
+          if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
+            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+            subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, "-\n" + subtitleLate.contenido));
+          }
+          else {
+            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleLate.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+            subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
+          }
+
+        }
+
+        else if (subtitleEarly == subtitlesB[j]) {
+          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, "-\n" + subtitleEarly.contenido));
+
+          if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
+            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleLate.contenido + "\n" + subtitleEarly.contenido));
+            subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, subtitleLate.contenido + "\n-"));
+          }
+          else {
+            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleLate.final, subtitleLate.contenido + "\n" + subtitleEarly.contenido));
+            subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, "-\n" + subtitleEarly.contenido));
+          }
+
+        }
+        i++;
+        j++;
+      }
     }
   }
+  return subtitlesC;
 }
 
 function altMerge2(subtitlesA, subtitlesB) {
@@ -393,92 +410,79 @@ function altMerge2(subtitlesA, subtitlesB) {
   }
   return subtitlesC;
 }
+//Parámetro:timeStamp en formato "00:00:00,000" de inicio o final de un objeto Subtitle
+//Funcionamiento: devuelve un objeto Date creado a partir de un timeStamp
+function toDate(timeStamp) {
+  return new Date(Date.parse("2012-01-01T" + timeStamp.replace(",", ".")));
+}
+//Parámtros: un string con contenido de un fichero SRT, y el nombre del fichero deseado
+//Funcionamiento: habilita enlace de descarga para descargar fichero SRT
+function download(data, filename) {
 
-function altMerge(subtitlesA, subtitlesB) {
-  let subtitlesC = [];
+  let enlaceDeDescarga = document.getElementById("descarga");
+  enlaceDeDescarga.download = filename;
+  enlaceDeDescarga.hidden = false;
 
-  for (let i = 0, j = 0; i < subtitlesA.length && j < subtitlesB.length;) {
-    let subtitleEarly = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesB[j] : subtitlesA[i];
-    let subtitleLate = toDate(subtitlesA[i].inicio) > toDate(subtitlesB[j].inicio) ? subtitlesA[i] : subtitlesB[j];
+  let blob = new Blob([data], { type: 'text/plain' });
+  enlaceDeDescarga.href = URL.createObjectURL(blob);
 
-    if (toDate(subtitleEarly.final) < toDate(subtitleLate.inicio)) {
-      if (subtitleEarly == subtitlesA[i]) {
-        subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
-        i++;
-      }
-      else {
-        subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, "-\n" + subtitleEarly.contenido));
-        j++;
-      }
+  enlaceDeDescarga.addEventListener("click", function () {
+    URL.revokeObjectURL(this.href);
+  })
+
+
+}
+//Parámetros: array de objetos Subtitle
+//Funcionamiento: devuelve un array de Subtitles como un único String en formato SRT
+function unParseSRT(subtitles) {
+  let unParsedSRT = "";
+  for (let i = 0; i < subtitles.length; i++) {
+
+    unParsedSRT += (i + 1) + "\n" + subtitles[i].inicio + " --> " + subtitles[i].final + "\n" + subtitles[i].contenido + "\n\n";
+
+  }
+  return unParsedSRT;
+}
+// Parámetros:array de objetos Subtitle
+//Funcionamiento:añade persistencia al array de subtitulos que se pasa por parámetro.
+function addPersistence(subtitles) {
+  let persistenceTime = Number(document.getElementById("persistenceSeconds").value) * 1000;
+
+  for (let i = 0; i < subtitles.length - 1; i++) {
+    let timeStampFinalDate = toDate(subtitles[i].final);
+    let timeStampInicioDate = toDate(subtitles[i + 1].inicio);
+
+    if (timeStampInicioDate - timeStampFinalDate > persistenceTime) {
+      timeStampFinalDate.setSeconds(timeStampFinalDate.getSeconds() + (persistenceTime / 1000));
+
+      let stringHours = timeStampFinalDate.getHours().toString().length == 2 ? "" + timeStampFinalDate.getHours() : "0" + timeStampFinalDate.getHours();
+      let stringMinutes = timeStampFinalDate.getMinutes().toString().length == 2 ? "" + timeStampFinalDate.getMinutes() : "0" + timeStampFinalDate.getMinutes();
+      let stringSeconds = timeStampFinalDate.getSeconds().toString().length == 2 ? "" + timeStampFinalDate.getSeconds() : "0" + timeStampFinalDate.getSeconds();
+      let stringMilliseconds = timeStampFinalDate.getMilliseconds().toString().length == 3 ?
+        "" + timeStampFinalDate.getMilliseconds() : timeStampFinalDate.getMilliseconds().toString().length == 2 ?
+          "0" + timeStampFinalDate.getMilliseconds() : "00" + timeStampFinalDate.getMilliseconds();
+
+      subtitles[i].final = stringHours + ":" + stringMinutes + ":" + stringSeconds + "," + stringMilliseconds;
+
     }
     else {
-      if (subtitleEarly.inicio == subtitleLate.inicio && subtitleEarly.final == subtitleLate.final) {
-        subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
-        i++;
-        j++;
-      }
-      else if (subtitleEarly.inicio == subtitleLate.inicio) {
-        if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
-          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
-          subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, "-\n" + subtitleLate.contenido));
-        }
-        else {
-          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
-          subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
-        }
-        i++;
-        j++;
-      }
-      else if (subtitleEarly.final == subtitleLate.final) {
-        if (subtitleAuxEarly = subtitlesA[i]) {
-          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, subtitleEarly.contenido + "\n-"));
-          subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+      timeStampFinalDate.setMilliseconds(timeStampInicioDate.getMilliseconds() - 20);
 
-        }
-        else {
-          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, "-\n" + subtitleEarly.contenido));
-          subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
+      let stringHours = timeStampFinalDate.getHours().toString().length == 2 ? "" + timeStampFinalDate.getHours() : "0" + timeStampFinalDate.getHours();
+      let stringMinutes = timeStampFinalDate.getMinutes().toString().length == 2 ? "" + timeStampFinalDate.getMinutes() : "0" + timeStampFinalDate.getMinutes();
+      let stringSeconds = timeStampFinalDate.getSeconds().toString().length == 2 ? "" + timeStampFinalDate.getSeconds() : "0" + timeStampFinalDate.getSeconds();
+      let stringMilliseconds = timeStampFinalDate.getMilliseconds().toString().length == 3 ?
+        "" + timeStampFinalDate.getMilliseconds() : timeStampFinalDate.getMilliseconds().toString().length == 2 ?
+          "0" + timeStampFinalDate.getMilliseconds() : "00" + timeStampFinalDate.getMilliseconds();
 
-        }
-        i++;
-        j++;
-      }
-      else {
-
-        if (subtitleEarly == subtitlesA[i]) {
-          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, subtitleEarly.contenido + "\n-"));
-
-          if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
-            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
-            subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, "-\n" + subtitleLate.contenido));
-          }
-          else {
-            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleLate.final, subtitleEarly.contenido + "\n" + subtitleLate.contenido));
-            subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, subtitleEarly.contenido + "\n-"));
-          }
-
-        }
-
-        else if (subtitleEarly == subtitlesB[j]) {
-          subtitlesC.push(new Subtitle(subtitleEarly.inicio, subtitleLate.inicio, "-\n" + subtitleEarly.contenido));
-
-          if (toDate(subtitleEarly.final) < toDate(subtitleLate.final)) {
-            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleEarly.final, subtitleLate.contenido + "\n" + subtitleEarly.contenido));
-            subtitlesC.push(new Subtitle(subtitleEarly.final, subtitleLate.final, subtitleLate.contenido + "\n-"));
-          }
-          else {
-            subtitlesC.push(new Subtitle(subtitleLate.inicio, subtitleLate.final, subtitleLate.contenido + "\n" + subtitleEarly.contenido));
-            subtitlesC.push(new Subtitle(subtitleLate.final, subtitleEarly.final, "-\n" + subtitleEarly.contenido));
-          }
-
-        }
-        i++;
-        j++;
-      }
+      subtitles[i].final = stringHours + ":" + stringMinutes + ":" + stringSeconds + "," + stringMilliseconds;
     }
   }
-  return subtitlesC;
 }
+
+
+
+
 
 function altMerge3(subtitlesA, subtitlesB) {
   let subtitlesC = [];
@@ -501,14 +505,15 @@ function altMerge3(subtitlesA, subtitlesB) {
 
   eventos.sort(function (a, b) { return a.marca - b.marca; });
 
-
-
   let prevTime = eventos[0].marca;
 
   for (event of eventos) {
 
-    if (prevTime != event.marca) {
-      subtitlesC.push(new Subtitle(prevTime, event.marca, activeA + "\n" + activeB));
+    if (prevTime != event.marca ) {
+      if(!(activeA == "-" && activeB == "-")){
+        subtitlesC.push(new Subtitle(toTimeStamp(prevTime), toTimeStamp(event.marca), activeA + "\n" + activeB));
+      }
+      
     }
 
     if (event.tipo == "inicio") {
@@ -528,7 +533,7 @@ function altMerge3(subtitlesA, subtitlesB) {
       }
     }
 
-    prevTime = event.time
+    prevTime = event.marca;
   }
   return subtitlesC;
 }
@@ -571,11 +576,8 @@ document.getElementById("mergeButton")
       //   addPersistence(subtitlesC);
       // }
 
-      subtitlesC = altMerge(subtitlesA, subtitlesB);
-      console.log(toTimeStamp(toMiliSeconds(subtitlesC[0].inicio)));
-      console.log(toTimeStamp(toMiliSeconds(subtitlesC[subtitlesC.length - 1].inicio)));
-      // subtitlesC = altMerge2(subtitlesA, subtitlesB);
-      // subtitlesC = altMerge3(subtitlesA, subtitlesB);
+  
+      subtitlesC = altMerge3(subtitlesA, subtitlesB);
 
 
       write(thirdOutPut, subtitlesC);
