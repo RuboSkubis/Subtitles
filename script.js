@@ -433,8 +433,8 @@ function write(outPut, subtitles) {
 function eventMerge(subtitlesA, subtitlesB) {
   let subtitlesC = [];
   let eventos = [];
-  let activeA = "";
-  let activeB = "";
+  let activeA = "-";
+  let activeB = "-";
 
   for (let i = 0; i < subtitlesA.length; i++) {
     let eventoInicio = new Evento(subtitlesA[i].inicio, "A", "inicio", subtitlesA[i].contenido);
@@ -456,7 +456,7 @@ function eventMerge(subtitlesA, subtitlesB) {
   for (event of eventos) {
 
     if (prevTime != event.marca) {
-      if (!(activeA == "" && activeB == "")) {
+      if (!(activeA == "-" && activeB == "-")) {
         subtitlesC.push(new Subtitle(prevTime, event.marca, activeA + "\n" + activeB));
       }
 
@@ -472,10 +472,10 @@ function eventMerge(subtitlesA, subtitlesB) {
     }
     else {
       if (event.idioma == "A") {
-        activeA = "";
+        activeA = "-";
       }
       else {
-        activeB = "";
+        activeB = "-";
       }
     }
 
@@ -506,13 +506,13 @@ function addPersistence(subtitles) {
   let persistenceTime = Number(document.getElementById("persistenceSeconds").value) * 1000;
 
   for (let i = 0; i < subtitles.length - 1; i++) {
-    
+
 
     if (subtitles[i + 1].inicio - subtitles[i].final > persistenceTime) {
       subtitles[i].final += persistenceTime;
     }
     else {
-      subtitles[i].final += (subtitles[i+1].inicio-20);
+      subtitles[i].final += (subtitles[i + 1].inicio - 20);
     }
   }
 }
@@ -522,10 +522,10 @@ function getSpecialSubtitles(subtitles) {
   let specialSubtitles = subtitles.filter(function (item) {
 
     if (item.contenido.match(/-/)) {
-      if (item.contenido.includes("-\n") && (item.final-item.inicio<1000)) {
+      if (item.contenido.includes("-\n") && (item.final - item.inicio < 1000)) {
         return false;
       }
-      else if (item.contenido.at(-2) == "\n" && (item.final-item.inicio<1000)) {
+      else if (item.contenido.at(-2) == "\n" && (item.final - item.inicio < 1000)) {
         return false;
       }
       else {
@@ -576,12 +576,14 @@ document.getElementById("mergeButton")
 
       // subtitlesC = merge(subtitlesA, subtitlesB);
 
-      // if (document.getElementById("persistenceCheckBox").checked) {
-      //   addPersistence(subtitlesC);
-      // }
+
 
 
       subtitlesC = eventMerge(subtitlesA, subtitlesB);
+      
+      if (document.getElementById("persistenceCheckBox").checked) {
+        addPersistence(subtitlesC);
+      }
 
       // subtitlesC = getSpecialSubtitles(subtitlesC);
 
@@ -591,8 +593,8 @@ document.getElementById("mergeButton")
       //   console.log(subtitle.final-subtitle.inicio);
       // }
 
-   
-  
+
+
       write(thirdOutPut, subtitlesC);
       download(unParseSRT(subtitlesC), "resultado.srt");
 
