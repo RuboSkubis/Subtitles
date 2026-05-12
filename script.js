@@ -491,7 +491,7 @@ function download(data, filename) {
   enlaceDeDescarga.download = filename;
   enlaceDeDescarga.hidden = false;
 
-  let blob = new Blob([data], { type: 'text/plain' });
+  let blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
   enlaceDeDescarga.href = URL.createObjectURL(blob);
 
   enlaceDeDescarga.addEventListener("click", function () {
@@ -512,7 +512,7 @@ function addPersistence(subtitles) {
       subtitles[i].final += persistenceTime;
     }
     else {
-      subtitles[i].final += (subtitles[i + 1].inicio - 20);
+      subtitles[i].final += (subtitles[i + 1].inicio -subtitles[i].final - 20);
     }
   }
 }
@@ -549,10 +549,8 @@ document.getElementById('inputfile')
       function (result) {
         subtitlesA = parseSRT(result);
         write(firstOutPut, subtitlesA);
-
       }
     );
-
   });
 
 document.getElementById('secFile')
@@ -563,48 +561,31 @@ document.getElementById('secFile')
       function (result) {
         subtitlesB = parseSRT(result);
         write(secondOutPut, subtitlesB);
-
-
       }
     );
-
   });
 
 document.getElementById("mergeButton")
   .addEventListener('click', function () {
     if (subtitlesA.length != 0 && subtitlesB.length != 0) {
 
-      // subtitlesC = merge(subtitlesA, subtitlesB);
-
-
-
-
       subtitlesC = eventMerge(subtitlesA, subtitlesB);
-      
+
       if (document.getElementById("persistenceCheckBox").checked) {
         addPersistence(subtitlesC);
       }
-
-      // subtitlesC = getSpecialSubtitles(subtitlesC);
-
-      console.log(subtitlesC);
-      // for(subtitle of specialSubtitles){
-      //   console.log(subtitle);
-      //   console.log(subtitle.final-subtitle.inicio);
-      // }
-
-
+      if (document.getElementById("opti").checked) {
+        subtitlesC = getSpecialSubtitles(subtitlesC);
+      }
 
       write(thirdOutPut, subtitlesC);
-      download(unParseSRT(subtitlesC), "resultado.srt");
-
-
-
+      let nombreFichero = prompt("Indica el nombre que deseas para el fichero resultado");
+      nombreFichero += ".srt";
+      download(unParseSRT(subtitlesC), nombreFichero);
     }
     else {
       alert("Tienes que meter dos ficheros.");
     }
-
   });
 
 document.getElementById("persistenceCheckBox")
@@ -614,9 +595,7 @@ document.getElementById("persistenceCheckBox")
     }
     else {
       document.getElementById("persistenceSeconds").disabled = true;
-
     }
-
   })
 
 
