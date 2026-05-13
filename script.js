@@ -506,19 +506,67 @@ function addPersistence(subtitles) {
   let persistenceTime = Number(document.getElementById("persistenceSeconds").value) * 1000;
 
   for (let i = 0; i < subtitles.length - 1; i++) {
-
-
     if (subtitles[i + 1].inicio - subtitles[i].final > persistenceTime) {
       subtitles[i].final += persistenceTime;
     }
     else {
-      subtitles[i].final += (subtitles[i + 1].inicio -subtitles[i].final - 20);
+      subtitles[i].final += (subtitles[i + 1].inicio - subtitles[i].final - 20);
     }
   }
+}
+
+function addDoublePersistance(subtitles, persistenceTime) {
+
+  for (let i = 0; i < subtitles.length - 1; i++) {
+    if (subtitles[i].contenido.includes("-\n") || subtitles[i].contenido.at(-2) == "\n") {
+      continue;
+    }
+    else {
+      if (subtitles[i + 1].inicio - subtitles[i].final > persistenceTime) {
+        subtitles[i].final += persistenceTime;
+      }
+      else {
+        subtitles[i].final += (subtitles[i + 1].inicio - subtitles[i].final) - 20;
+      }
+      if (subtitles[i].inicio - subtitles[i - 1].final > persistenceTime) {
+        subtitles[i].inicio -= persistenceTime;
+      }
+      else {
+        subtitles[i].inicio -= (subtitles[i].inicio - subtitles[i - 1].final) + 20;
+      }
+    }
+  }
+
 }
 //Parámetros: array de objetos subtitle
 //Funcionamiento: devuelve un array de objetos subtitle, pero habiendo quitado aquellos subtitulos en los que solo hay un idioma y la duracion es menor a 1 segundo
 function getSpecialSubtitles(subtitles) {
+
+  let lonelySubtitles = subtitles.filter(function (item) {
+
+    if (item.contenido.match(/-/)) {
+      if (item.contenido.includes("-\n") && (item.final - item.inicio < 1000)) {
+        return true;
+      }
+      else if (item.contenido.at(-2) == "\n" && (item.final - item.inicio < 1000)) {
+        return true;
+      }
+      else {
+        return false;
+      }
+
+    }
+    else {
+      return false;
+    }
+
+  });
+
+  let media = Math.ceil(lonelySubtitles.reduce((sum, current) => sum + (current.final - current.inicio), 0) / lonelySubtitles.length);
+  media = Math.ceil(media / 2);
+
+
+
   let specialSubtitles = subtitles.filter(function (item) {
 
     if (item.contenido.match(/-/)) {
@@ -538,6 +586,7 @@ function getSpecialSubtitles(subtitles) {
     }
 
   });
+  addDoublePersistance(specialSubtitles, media);
   return specialSubtitles;
 }
 
@@ -571,15 +620,17 @@ document.getElementById("mergeButton")
 
       subtitlesC = eventMerge(subtitlesA, subtitlesB);
 
-      if (document.getElementById("persistenceCheckBox").checked) {
-        addPersistence(subtitlesC);
-      }
       if (document.getElementById("opti").checked) {
         subtitlesC = getSpecialSubtitles(subtitlesC);
       }
+      if (document.getElementById("persistenceCheckBox").checked) {
+        addPersistence(subtitlesC);
+      }
+
 
       write(thirdOutPut, subtitlesC);
-      let nombreFichero = prompt("Indica el nombre que deseas para el fichero resultado");
+      // let nombreFichero = prompt("Indica el nombre que deseas para el fichero resultado");
+      let nombreFichero = "resultado";
       nombreFichero += ".srt";
       download(unParseSRT(subtitlesC), nombreFichero);
     }
