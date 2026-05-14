@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <input type="file" name="inputfile" id="inputfile">
+    <input type="file" name="secFile" id="secFile">
+
+    <button type="button" id= "mergeButton"  >Merge</button>
+<!-- 
+    <input type="radio" class="modeButton" name = "mode" value="upPriority" id="up" checked>
+    <label for="up">Prioridad de los subtitulos superiores.</label>
+
+    <input type="radio" class="modeButton" name = "mode" value="downPriority" id="down">
+    <label for="down">Prioridad de los subtitulos inferiores</label>
+
+    <input type="radio" class="modeButton" name = "mode" value = "maxTime" id="max">
+    <label for="max">Maximizar tiempo</label>
+
+    <input type="radio" class="modeButton" name = "mode" value="minTime" id="min">
+    <label for="min">Minimizar tiempo</label> -->
+
+
+    <input type="checkbox" id="opti">
+    <label for="opti">Eliminar subtítulos solitarios.</label>
+
+    <input type="checkbox" id="persistenceCheckBox" disabled>
+    <label for="persistence">Persistencia (segundos):</label>
+
+    <input type="number" id="persistenceSeconds" >
+
+    
+
+    <a href="" hidden id="descarga">Descarga</a>
+    
+    <br>
+    <div id="container">
+        <pre id="output"></pre>
+        <pre id="secOutPut"></pre>
+        <pre id="thirdOutPut"></pre>
+        <pre id="forthOutPut"></pre>
+    </div>
+    <script type="text/javascript" src="script.js">
+
+    </script>
+
+</body>
+
+</html>
