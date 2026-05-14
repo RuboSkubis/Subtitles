@@ -503,9 +503,13 @@ function download(data, filename) {
 // Parámetros:array de objetos Subtitle
 //Funcionamiento:añade persistencia al array de subtitulos que se pasa por parámetro.
 function addPersistence(subtitles) {
+
   let persistenceTime = Number(document.getElementById("persistenceSeconds").value) * 1000;
 
   for (let i = 0; i < subtitles.length - 1; i++) {
+    if ((subtitles[i].contenido.includes("-\n") || subtitles[i].contenido.at(-2) == "\n") && !subtitles[i].contenido.match(/-.{1,}-\n/)) {
+      continue;
+    }
     if (subtitles[i + 1].inicio - subtitles[i].final > persistenceTime) {
       subtitles[i].final += persistenceTime;
     }
@@ -516,24 +520,25 @@ function addPersistence(subtitles) {
 }
 
 function addDoublePersistance(subtitles, persistenceTime) {
-
+  console.log(persistenceTime);
   for (let i = 0; i < subtitles.length - 1; i++) {
-    if (subtitles[i].contenido.includes("-\n") || subtitles[i].contenido.at(-2) == "\n") {
+    if ((subtitles[i].contenido.includes("-\n") || subtitles[i].contenido.at(-2) == "\n") && !subtitles[i].contenido.match(/-.{1,}-\n/)) {
       continue;
     }
     else {
       if (subtitles[i + 1].inicio - subtitles[i].final > persistenceTime) {
         subtitles[i].final += persistenceTime;
       }
-      else {
-        subtitles[i].final += (subtitles[i + 1].inicio - subtitles[i].final) - 20;
+
+      if (i > 0) {
+        if (subtitles[i].inicio - subtitles[i - 1].final > persistenceTime) {
+          subtitles[i].inicio = subtitles[i].inicio - persistenceTime;
+        }
+        else {
+          subtitles[i].inicio = subtitles[i - 1].final;
+        }
       }
-      if (subtitles[i].inicio - subtitles[i - 1].final > persistenceTime) {
-        subtitles[i].inicio -= persistenceTime;
-      }
-      else {
-        subtitles[i].inicio -= (subtitles[i].inicio - subtitles[i - 1].final) + 20;
-      }
+
     }
   }
 
@@ -545,7 +550,7 @@ function getSpecialSubtitles(subtitles) {
   let lonelySubtitles = subtitles.filter(function (item) {
 
     if (item.contenido.match(/-/)) {
-      if (item.contenido.includes("-\n") && (item.final - item.inicio < 1000)) {
+      if (item.contenido.includes("-\n") && (item.final - item.inicio < 1000) && !item.contenido.match(/-.{1,}-\n/)) {
         return true;
       }
       else if (item.contenido.at(-2) == "\n" && (item.final - item.inicio < 1000)) {
@@ -562,15 +567,10 @@ function getSpecialSubtitles(subtitles) {
 
   });
 
-  let media = Math.ceil(lonelySubtitles.reduce((sum, current) => sum + (current.final - current.inicio), 0) / lonelySubtitles.length);
-  media = Math.ceil(media / 2);
-
-
-
   let specialSubtitles = subtitles.filter(function (item) {
 
     if (item.contenido.match(/-/)) {
-      if (item.contenido.includes("-\n") && (item.final - item.inicio < 1000)) {
+      if (item.contenido.includes("-\n") && (item.final - item.inicio < 1000) && !item.contenido.match(/-.{1,}-\n/)) {
         return false;
       }
       else if (item.contenido.at(-2) == "\n" && (item.final - item.inicio < 1000)) {
@@ -586,6 +586,33 @@ function getSpecialSubtitles(subtitles) {
     }
 
   });
+
+  let lonelyNecesarySubtitles = specialSubtitles.filter(function (item) {
+
+
+    if (item.contenido.match(/-/)) {
+      if (item.contenido.includes("-\n") && !item.contenido.match(/-.{1,}-\n/)) {
+        return true;
+      }
+      else if (item.contenido.at(-2) == "\n") {
+        return true;
+      }
+      else {
+        return false;
+      }
+
+    }
+    else {
+      return false;
+    }
+
+  });
+
+  let media = Math.ceil(lonelySubtitles.reduce((sum, current) => sum + (current.final - current.inicio), 0) / (specialSubtitles.length - lonelyNecesarySubtitles.length));
+  console.log("Media:" + media);
+  media = Math.ceil(media / 2);
+  console.log("Media por los lados:" + media);
+
   addDoublePersistance(specialSubtitles, media);
   return specialSubtitles;
 }
@@ -620,13 +647,13 @@ document.getElementById("mergeButton")
 
       subtitlesC = eventMerge(subtitlesA, subtitlesB);
 
+
       if (document.getElementById("opti").checked) {
         subtitlesC = getSpecialSubtitles(subtitlesC);
+        if (document.getElementById("persistenceCheckBox").checked) {
+          addPersistence(subtitlesC);
+        }
       }
-      if (document.getElementById("persistenceCheckBox").checked) {
-        addPersistence(subtitlesC);
-      }
-
 
       write(thirdOutPut, subtitlesC);
       // let nombreFichero = prompt("Indica el nombre que deseas para el fichero resultado");
@@ -639,15 +666,23 @@ document.getElementById("mergeButton")
     }
   });
 
-document.getElementById("persistenceCheckBox")
+
+
+document.getElementById("opti")
   .addEventListener("change", function () {
     if (this.checked) {
+      document.getElementById("persistenceCheckBox").disabled = false;
       document.getElementById("persistenceSeconds").disabled = false;
+
     }
     else {
+      document.getElementById("persistenceCheckBox").disabled = true;
       document.getElementById("persistenceSeconds").disabled = true;
+      document.getElementById("persistenceSeconds").value = "";
     }
-  })
+  });
+
+
 
 
 
