@@ -291,13 +291,16 @@ let subtitlesC = [];
 //   return new Date(Date.parse("2012-01-01T" + timeStamp.replace(",", ".")));
 // }
 
-/*//Objeto que modela el subtítulo SRT*/
+/*//Objeto que modela el subtítulo SRT: la marca es su timeStamp en milisegundos, y el contenido es un string separando cada 
+// idioma con un salto de línea*/
 function Subtitle(inicio, final, contenido) {
   this.inicio = inicio;
   this.final = final;
   this.contenido = contenido;
 }
-//Objeto que modela el evento inicio o final
+//Objeto que modela un evento: la marca es su timeStamp (que sera de inicio o final segun el evento sea de inicio o final)
+//el idioma será un String con la letra "A"o "B", segun sea el idioma de arriba o abajo; el tipo sera un string con valor "inicio" o "final"
+//para distinguir los dos tipos de eventos; el texto será el contenido asociado a un evento de inicio y en caso de ser un evento final valdrá undefined
 function Evento(marca, idioma, tipo, texto = undefined) {
   this.marca = marca;
   this.idioma = idioma;
@@ -331,7 +334,7 @@ function toMiliSeconds(timeStamp) {
   return ms + (seconds * 1000) + (minutes * 60 * 1000) + (hours * 60 * 60 * 1000);
 }
 //Parámetro: entero que representa una cantidad de milisegundos
-//Funcionamiento: devuelve cadena en formato XX:XX:XX,XXX (timestamp)
+//Funcionamiento: devuelve cadena en formato XX:XX:XX,XXX (timestamp) correspondiente a dichos milisegundos
 function toTimeStamp(ms) {
 
   let hora = Math.floor(ms / (60 * 60 * 1000));
@@ -404,7 +407,7 @@ function parseSRT(stringFichero) {
 
 }
 //Parámetros: array de objetos Subtitle
-//Funcionamiento: devuelve un array de Subtitles como un único String en formato SRT
+//Funcionamiento: devuelve un único String en formato SRT según los subtitúlos de entrada para ser copiado en un fichero de texto
 function unParseSRT(subtitles) {
   let unParsedSRT = "";
   for (let i = 0; i < subtitles.length; i++) {
@@ -414,7 +417,7 @@ function unParseSRT(subtitles) {
   }
   return unParsedSRT;
 }
-//Parámetros: elemento HTML donde imprimir contenido para comparaciones y array de objetos "Subtitle"
+//Parámetros: elemento HTML donde imprimir contenido para comparaciones visuales en la ventana y array de objetos "Subtitle"
 //Funcionamiento: (se presupone outPut = etiqueta <pre>)imprime en output lo que se imprimiría en el fichero SRT basándose
 //en un array de objetos "Subtitle"
 function write(outPut, subtitles) {
@@ -430,6 +433,8 @@ function write(outPut, subtitles) {
 }
 //Parámetros: dos arrays de objetos Subtitulos para fusionar
 //Funcionamiento: devuelve un array de objetos subtítulo resultado de fusionar los arrays de entrada
+//utilizando la estrategia de eventos:en el resultado habrán subtítulos "espúreos" de corta duración en los que solo 
+//hay presente un idioma aun habiendo 1 o más subtítulos correspondientes en el otro idioma
 function eventMerge(subtitlesA, subtitlesB) {
   let subtitlesC = [];
   let eventos = [];
@@ -502,9 +507,7 @@ function download(data, filename) {
 }
 // Parámetros:array de objetos Subtitle
 //Funcionamiento:añade persistencia al array de subtitulos que se pasa por parámetro.
-function addPersistence(subtitles) {
-
-  let persistenceTime = Number(document.getElementById("persistenceSeconds").value) * 1000;
+function addPersistence(subtitles,persistenceTime) {
 
   for (let i = 0; i < subtitles.length - 1; i++) {
     if ((subtitles[i].contenido.includes("-\n") || subtitles[i].contenido.at(-2) == "\n") && !subtitles[i].contenido.match(/-.{1,}-\n/)) {
@@ -518,7 +521,10 @@ function addPersistence(subtitles) {
     }
   }
 }
-
+//Parámetros: array de objetos subtitle y tiempo de persistencia (hacia los lados)
+//Funcionamiento: similar a la función addPersistence, pero en su lugar añade persistencia al principio y al final de cada subtítulo
+//En principio está funcio está solamente para ser utilizada al seleccionar el modo "eliminar subtitulos solitarios", ya que sirve 
+//para "recuperar algo de tiempo" de subitulo cuando hemos eliminado los subtítulos "espúreos"
 function addDoublePersistance(subtitles, persistenceTime) {
   console.log(persistenceTime);
   for (let i = 0; i < subtitles.length - 1; i++) {
@@ -545,6 +551,7 @@ function addDoublePersistance(subtitles, persistenceTime) {
 }
 //Parámetros: array de objetos subtitle
 //Funcionamiento: devuelve un array de objetos subtitle, pero habiendo quitado aquellos subtitulos en los que solo hay un idioma y la duracion es menor a 1 segundo
+//Además, añade doble persistencia con "addDoublePersistence" la pérdida de milisegundos de subtítulos al eliminar los subtítulos "espúreos"
 function getSpecialSubtitles(subtitles) {
 
   let lonelySubtitles = subtitles.filter(function (item) {
@@ -616,7 +623,8 @@ function getSpecialSubtitles(subtitles) {
   addDoublePersistance(specialSubtitles, media);
   return specialSubtitles;
 }
-
+//Funcionamiento: hace que se pueda meter en el primer input file un fichero (idioma A), y después lo imprime en la ventana del navegador para ver 
+//el resultado del parseo, dejando cada subtítulo como una sola línea
 document.getElementById('inputfile')
   .addEventListener('change', function () {
     let promesaDefichero = read(this);
@@ -628,7 +636,8 @@ document.getElementById('inputfile')
       }
     );
   });
-
+//Funcionamiento: hace que se pueda meter en el segundo input file un fichero (idioma B), y después lo imprime en la ventana del navegador para ver 
+//el resultado del parseo, dejando cada subtítulo como una sola línea
 document.getElementById('secFile')
   .addEventListener('change', function () {
     let promesaDefichero = read(this);
@@ -640,18 +649,21 @@ document.getElementById('secFile')
       }
     );
   });
-
+//Funcionamiento: tras introducir dos ficheros en los dos input files (porque de lo contrario no permite hacer nada) fusiona los dos ficheros 
+//srt de entrada, generando un array de objetos subtítulo resultado de la fusión; después comprueba si está marcada la opción de "Eliminar subtitulos
+// solitarios" para eliminar subtítulos espúreos y, en tal caso, si hay el modo persistencia esta activado y hay un valor de segundos, añade persistencia
+// al array de subtítulos resultado de la fusión. Por último escribe el resultado en la ventana para comprobaciones, y habilita un enlace de descarga
+// para el fichero de subtítulos resultado de la fusión"
 document.getElementById("mergeButton")
   .addEventListener('click', function () {
     if (subtitlesA.length != 0 && subtitlesB.length != 0) {
 
       subtitlesC = eventMerge(subtitlesA, subtitlesB);
 
-
       if (document.getElementById("opti").checked) {
         subtitlesC = getSpecialSubtitles(subtitlesC);
         if (document.getElementById("persistenceCheckBox").checked) {
-          addPersistence(subtitlesC);
+          addPersistence(subtitlesC,Number(document.getElementById("persistenceSeconds").value) * 1000);
         }
       }
 
@@ -667,7 +679,8 @@ document.getElementById("mergeButton")
   });
 
 
-
+//Funcionamiento:hace que marcar la opción de "Eliminar subtítulos solitarios" habilite o deshabilite el modo persistencia, ya que 
+//el modo persistencia solo tiene sentido en caso de seleccionar la opción "Eliminar subtítulos solitarios"
 document.getElementById("opti")
   .addEventListener("change", function () {
     if (this.checked) {
