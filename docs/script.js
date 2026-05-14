@@ -676,10 +676,10 @@ document.getElementById("opti")
 
     }
     else {
-      document.getElementById("persistenceCheckBox").disabled = true;
-      if(document.getElementById("persistenceCheckBox").checked==true){
+      if (document.getElementById("persistenceCheckBox").checked == true) {
         document.getElementById("persistenceCheckBox").checked == false;
       }
+      document.getElementById("persistenceCheckBox").disabled = true;
       document.getElementById("persistenceSeconds").disabled = true;
       document.getElementById("persistenceSeconds").value = "";
     }
