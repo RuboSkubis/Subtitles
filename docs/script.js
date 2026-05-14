@@ -509,7 +509,7 @@ function download(data, filename) {
 }
 // Parámetros:array de objetos Subtitle
 //Funcionamiento:añade persistencia al array de subtitulos que se pasa por parámetro.
-function addPersistence(subtitles,persistenceTime) {
+function addPersistence(subtitles, persistenceTime) {
 
   for (let i = 0; i < subtitles.length - 1; i++) {
     if ((subtitles[i].contenido.includes("-\n") || subtitles[i].contenido.at(-2) == "\n") && !subtitles[i].contenido.match(/-.{1,}-\n/)) {
@@ -664,9 +664,6 @@ document.getElementById("mergeButton")
 
       if (document.getElementById("opti").checked) {
         subtitlesC = getSpecialSubtitles(subtitlesC);
-        if (document.getElementById("persistenceCheckBox").checked) {
-          addPersistence(subtitlesC,Number(document.getElementById("persistenceSeconds").value) * 1000);
-        }
       }
 
       write(thirdOutPut, subtitlesC);
@@ -686,17 +683,14 @@ document.getElementById("mergeButton")
 document.getElementById("opti")
   .addEventListener("change", function () {
     if (this.checked) {
-      document.getElementById("persistenceCheckBox").disabled = false;
-      document.getElementById("persistenceSeconds").disabled = false;
+      document.getElementById("persistenceLabel").hidden = false;
+      document.getElementById("persistence").hidden = false;
 
     }
     else {
-      if (document.getElementById("persistenceCheckBox").checked == true) {
-        document.getElementById("persistenceCheckBox").checked == false;
-      }
-      document.getElementById("persistenceCheckBox").disabled = true;
-      document.getElementById("persistenceSeconds").disabled = true;
-      document.getElementById("persistenceSeconds").value = "";
+      document.getElementById("persistenceLabel").hidden = true;
+      document.getElementById("persistence").hidden = true;
+      document.getElementById("persistence").value="";
     }
   });
 
