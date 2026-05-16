@@ -382,7 +382,13 @@ function toTimeStamp(ms) {
 //Parámetros: contenido del fichero en variable string y array vacío donde se meterán "objetos subtitulo SRT" (objeto Subtitle)
 //Funcionamiento: Devuelve un array de objetos "Subtitle" basándose en los subtítulos presentes en el fichero SRT
 function parseSRT(stringFichero) {
+
+
   let arrayStringFichero = stringFichero.trim().split("\n");
+  for (let i = 0; i < arrayStringFichero.length; i++) {
+    arrayStringFichero[i] = arrayStringFichero[i].trim();
+  }
+
   let subtitles = [];
   for (let i = 1; i < arrayStringFichero.length;) {
 
@@ -390,7 +396,7 @@ function parseSRT(stringFichero) {
     let final = toMiliSeconds(arrayStringFichero[i].match(regExpFinal)[0].trim());
     let contenido = arrayStringFichero[i + 1].trim();
 
-    if (arrayStringFichero[i + 2] == "" || arrayStringFichero[i + 2] == undefined || arrayStringFichero[i + 2] == "\r") {
+    if (arrayStringFichero[i + 2] == "" || arrayStringFichero[i + 2] == undefined) {
       subtitles.push(new Subtitle(inicio, final, contenido));
       i += 4;
 
@@ -629,27 +635,39 @@ function getSpecialSubtitles(subtitles) {
 //el resultado del parseo, dejando cada subtítulo como una sola línea
 document.getElementById('inputfile')
   .addEventListener('change', function () {
-    let promesaDefichero = read(this);
 
-    promesaDefichero.then(
-      function (result) {
-        subtitlesA = parseSRT(result);
-        write(firstOutPut, subtitlesA);
-      }
-    );
+    if (this.files[0].name.includes(".srt")) {
+      let promesaDefichero = read(this);
+
+      promesaDefichero.then(
+        function (result) {
+          subtitlesA = parseSRT(result);
+          write(firstOutPut, subtitlesA);
+        }
+      );
+    }
+    else {
+      alert("Tienes que introducir un archivo con extensión .srt");
+    }
+
   });
 //Funcionamiento: hace que se pueda meter en el segundo input file un fichero (idioma B), y después lo imprime en la ventana del navegador para ver 
 //el resultado del parseo, dejando cada subtítulo como una sola línea
 document.getElementById('secFile')
   .addEventListener('change', function () {
-    let promesaDefichero = read(this);
+    if (this.files[0].name.includes(".srt")) {
+      let promesaDefichero = read(this);
 
-    promesaDefichero.then(
-      function (result) {
-        subtitlesB = parseSRT(result);
-        write(secondOutPut, subtitlesB);
-      }
-    );
+      promesaDefichero.then(
+        function (result) {
+          subtitlesA = parseSRT(result);
+          write(firstOutPut, subtitlesA);
+        }
+      );
+    }
+    else {
+      alert("Tienes que introducir un archivo con extensión .srt");
+    }
   });
 //Funcionamiento: tras introducir dos ficheros en los dos input files (porque de lo contrario no permite hacer nada) fusiona los dos ficheros 
 //srt de entrada, generando un array de objetos subtítulo resultado de la fusión; después comprueba si está marcada la opción de "Eliminar subtitulos
@@ -664,10 +682,12 @@ document.getElementById("mergeButton")
       subtitlesC = eventMerge(subtitlesA, subtitlesB);
 
       if (document.getElementById("opti").checked) {
+
         subtitlesC = getSpecialSubtitles(subtitlesC);
       }
       if (document.getElementById("persistence").value != "") {
-        addPersistence(subtitlesC,Number(document.getElementById("persistence").value));
+        addPersistence(subtitlesC, Number(document.getElementById("persistence").value));
+
       }
 
       write(thirdOutPut, subtitlesC);
@@ -680,8 +700,6 @@ document.getElementById("mergeButton")
       alert("Tienes que meter dos ficheros.");
     }
   });
-
-
 //Funcionamiento:hace que marcar la opción de "Eliminar subtítulos solitarios" habilite o deshabilite el modo persistencia, ya que 
 //el modo persistencia solo tiene sentido en caso de seleccionar la opción "Eliminar subtítulos solitarios"
 document.getElementById("opti")
@@ -697,12 +715,9 @@ document.getElementById("opti")
       document.getElementById("persistence").value = "";
     }
   });
-  
 
-// document.getElementById("comprobar").addEventListener("click", function () {
-//   console.log(document.getElementById("persistence").value);
-//   console.log(typeof document.getElementById("persistence").value);
-// });
+
+
 
 
 
