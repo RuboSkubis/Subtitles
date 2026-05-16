@@ -697,11 +697,12 @@ document.getElementById("opti")
       document.getElementById("persistence").value = "";
     }
   });
+  
 
-document.getElementById("comprobar").addEventListener("click", function () {
-  console.log(document.getElementById("persistence").value);
-  console.log(typeof document.getElementById("persistence").value);
-});
+// document.getElementById("comprobar").addEventListener("click", function () {
+//   console.log(document.getElementById("persistence").value);
+//   console.log(typeof document.getElementById("persistence").value);
+// });
 
 
 
