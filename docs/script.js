@@ -6,6 +6,8 @@ const regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
 let firstOutPut = document.getElementById('output');
 let secondOutPut = document.getElementById("secOutPut");
 let thirdOutPut = document.getElementById('thirdOutPut');
+
+
 //subtitlesA será el idioma superior y subtitlesB el inferior
 //subtitlesC es el array objetivo donde estará la fusión
 let subtitlesA = [];
@@ -494,7 +496,33 @@ function eventMerge(subtitlesA, subtitlesB) {
 
     prevTime = event.marca;
   }
+
   return subtitlesC;
+}
+function addColor(subtitles) {
+  let colorA = document.getElementById("colorA").value;
+  let colorB = document.getElementById("colorB").value;
+
+  if (colorA != "#ffffff") {
+
+    let contenidoA = "";
+    for (let i = 0; i < subtitles.length; i++) {
+      contenidoA = subtitles[i].contenido.split("\n")[0];
+
+      contenidoA = "<font color ='" + colorA + "'>" + contenidoA + "</font>";
+      subtitles[i].contenido = contenidoA + "\n" + subtitles[i].contenido.split("\n")[1];
+    }
+  }
+  if (colorB != "#ffffff") {
+
+    let contenidoB = "";
+    for (let i = 0; i < subtitles.length; i++) {
+      contenidoB = subtitles[i].contenido.split("\n")[1];
+
+      contenidoB = "<font color ='" + colorB + "'>" + contenidoB + "</font>";
+      subtitles[i].contenido = subtitles[i].contenido.split("\n")[0] + "\n" + contenidoB;
+    }
+  }
 }
 //Parámtros: un string con contenido de un fichero SRT, y el nombre del fichero deseado
 //Funcionamiento: habilita enlace de descarga para descargar fichero SRT
@@ -660,8 +688,8 @@ document.getElementById('secFile')
 
       promesaDefichero.then(
         function (result) {
-          subtitlesA = parseSRT(result);
-          write(firstOutPut, subtitlesA);
+          subtitlesB = parseSRT(result);
+          write(secondOutPut, subtitlesB);
         }
       );
     }
@@ -689,6 +717,7 @@ document.getElementById("mergeButton")
         addPersistence(subtitlesC, Number(document.getElementById("persistence").value));
 
       }
+      addColor(subtitlesC);
 
       write(thirdOutPut, subtitlesC);
       // let nombreFichero = prompt("Indica el nombre que deseas para el fichero resultado");
@@ -715,6 +744,17 @@ document.getElementById("opti")
       document.getElementById("persistence").value = "";
     }
   });
+
+
+
+
+
+
+
+
+
+
+
 
 
 

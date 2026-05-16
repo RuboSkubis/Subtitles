@@ -13,8 +13,8 @@
     <input type="file" name="inputfile" id="inputfile">
     <input type="file" name="secFile" id="secFile">
 
-    <button type="button" id= "mergeButton"  >Merge</button>
-<!-- 
+    <button type="button" id="mergeButton">Merge</button>
+    <!-- 
     <input type="radio" class="modeButton" name = "mode" value="upPriority" id="up" checked>
     <label for="up">Prioridad de los subtitulos superiores.</label>
 
@@ -34,12 +34,17 @@
     <label for="persistence" id="persistenceLabel" hidden>Persistencia (segundos):</label>
     <input type="number" id="persistence" hidden>
 
-    
+    <label for="colorA">Color idioma superior: </label>
+    <input type="color" id="colorA" value="#ffffff">
+
+    <label for="colorB">Color idioma inferior: </label>
+    <input type="color" id="colorB" value="#ffffff">
+
 
     <a href="" hidden id="descarga">Descarga</a>
 
-    
-    
+
+
     <br>
     <div id="container">
         <pre id="output"></pre>
