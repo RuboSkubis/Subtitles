@@ -667,7 +667,7 @@ document.getElementById("mergeButton")
         subtitlesC = getSpecialSubtitles(subtitlesC);
       }
       if (document.getElementById("persistence").value != "") {
-        addPersistence(subtitlesC);
+        addPersistence(subtitlesC,Number(document.getElementById("persistence").value));
       }
 
       write(thirdOutPut, subtitlesC);
