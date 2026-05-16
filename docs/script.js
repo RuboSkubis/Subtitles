@@ -1,6 +1,6 @@
+//Expresiones regulares para extraer timeStamp de inicio y final del string resultado de leer un fichero SRT
 const regExpInicio = /\d{2}:\d{2}:\d{2},\d{3}./;
 const regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
-const regExpEspecial = /[^.]?-[^.]?/;
 //Elementos html <pre> donde se imprimira el resultado de leer, respectivamente, el fichero A, el fichero B, y el fichero C
 //(en el caso de firstOutPut, y secondOutPut, el resultado que imprime es simplificadno todos los subtítulos a 1 sola línea)
 let firstOutPut = document.getElementById('output');
@@ -528,7 +528,7 @@ function addPersistence(subtitles, persistenceTime) {
 //En principio está funcio está solamente para ser utilizada al seleccionar el modo "eliminar subtitulos solitarios", ya que sirve 
 //para "recuperar algo de tiempo" de subitulo cuando hemos eliminado los subtítulos "espúreos"
 function addDoublePersistance(subtitles, persistenceTime) {
-  console.log(persistenceTime);
+
   for (let i = 0; i < subtitles.length - 1; i++) {
     if ((subtitles[i].contenido.includes("-\n") || subtitles[i].contenido.at(-2) == "\n") && !subtitles[i].contenido.match(/-.{1,}-\n/)) {
       continue;
@@ -658,12 +658,16 @@ document.getElementById('secFile')
 // para el fichero de subtítulos resultado de la fusión"
 document.getElementById("mergeButton")
   .addEventListener('click', function () {
+
     if (subtitlesA.length != 0 && subtitlesB.length != 0) {
 
       subtitlesC = eventMerge(subtitlesA, subtitlesB);
 
       if (document.getElementById("opti").checked) {
         subtitlesC = getSpecialSubtitles(subtitlesC);
+      }
+      if (document.getElementById("persistence").value != "") {
+        addPersistence(subtitlesC);
       }
 
       write(thirdOutPut, subtitlesC);
@@ -690,9 +694,14 @@ document.getElementById("opti")
     else {
       document.getElementById("persistenceLabel").hidden = true;
       document.getElementById("persistence").hidden = true;
-      document.getElementById("persistence").value="";
+      document.getElementById("persistence").value = "";
     }
   });
+
+document.getElementById("comprobar").addEventListener("click", function () {
+  console.log(document.getElementById("persistence").value);
+  console.log(typeof document.getElementById("persistence").value);
+});
 
 
 
