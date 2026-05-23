@@ -404,11 +404,16 @@ function parseSRT(stringFichero) {
 
 
     }
-    else {
+    else if (arrayStringFichero[i + 3] == "" || arrayStringFichero[i + 3] == undefined) {
       contenido += " " + arrayStringFichero[i + 2].trim();
       subtitles.push(new Subtitle(inicio, final, contenido));
       i += 5;
 
+    }
+    else {
+      contenido += " " + arrayStringFichero[i + 2].trim() + " " + arrayStringFichero[i + 3];
+      subtitles.push(new Subtitle(inicio, final, contenido));
+      i += 6;
     }
 
   }
@@ -461,6 +466,60 @@ function eventMerge(subtitlesA, subtitlesB) {
     let eventoInicio = new Evento(subtitlesB[i].inicio, "B", "inicio", subtitlesB[i].contenido);
     eventos.push(eventoInicio);
     let eventoFinal = new Evento(subtitlesB[i].final, "B", "final");
+    eventos.push(eventoFinal);
+  }
+
+  eventos.sort(function (a, b) { return a.marca - b.marca; });
+
+  let prevTime = eventos[0].marca;
+
+  for (event of eventos) {
+
+    if (prevTime != event.marca) {
+      if (!(activeA == "-" && activeB == "-")) {
+        subtitlesC.push(new Subtitle(prevTime, event.marca, activeA + "\n" + activeB));
+      }
+
+    }
+
+    if (event.tipo == "inicio") {
+      if (event.idioma == "A") {
+        activeA = event.texto;
+      }
+      else {
+        activeB = event.texto;
+      }
+    }
+    else {
+      if (event.idioma == "A") {
+        activeA = "-";
+      }
+      else {
+        activeB = "-";
+      }
+    }
+
+    prevTime = event.marca;
+  }
+
+  return subtitlesC;
+}
+function eventMerge2(subtitlesA, subtitlesB) {
+  let subtitlesC = [];
+  let eventos = [];
+  let activeA = "-";
+  let activeB = "-";
+
+  for (let i = 0; i < subtitlesA.length; i++) {
+    let eventoInicio = new Evento(subtitlesA[i].inicio, "A", "inicio", subtitlesA[i].contenido);
+    eventos.push(eventoInicio);
+    let eventoFinal = new Evento(subtitlesA[i].final, "A", "final", subtitlesA[i].contenido);
+    eventos.push(eventoFinal);
+  }
+  for (let i = 0; i < subtitlesB.length; i++) {
+    let eventoInicio = new Evento(subtitlesB[i].inicio, "B", "inicio", subtitlesB[i].contenido);
+    eventos.push(eventoInicio);
+    let eventoFinal = new Evento(subtitlesB[i].final, "B", "final", subtitlesB[i].contenido);
     eventos.push(eventoFinal);
   }
 
