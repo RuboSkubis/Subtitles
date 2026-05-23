@@ -289,10 +289,48 @@ let subtitlesC = [];
 //   }
 //   return subtitlesC;
 // }
-//Parámetro:timeStamp en formato "00:00:00,000" de inicio o final de un objeto Subtitle
-//Funcionamiento: devuelve un objeto Date creado a partir de un timeStamp
+// Parámetro:timeStamp en formato "00:00:00,000" de inicio o final de un objeto Subtitle
+// Funcionamiento: devuelve un objeto Date creado a partir de un timeStamp
 // function toDate(timeStamp) {
 //   return new Date(Date.parse("2012-01-01T" + timeStamp.replace(",", ".")));
+// }
+// function oldParseSRT(stringFichero) {
+
+
+//   let arrayStringFichero = stringFichero.trim().split("\n");
+//   for (let i = 0; i < arrayStringFichero.length; i++) {
+//     arrayStringFichero[i] = arrayStringFichero[i].trim();
+//   }
+
+//   let subtitles = [];
+//   for (let i = 1; i < arrayStringFichero.length;) {
+
+//     let inicio = toMiliSeconds(arrayStringFichero[i].match(regExpInicio)[0].trim());
+//     let final = toMiliSeconds(arrayStringFichero[i].match(regExpFinal)[0].trim());
+//     let contenido = arrayStringFichero[i + 1].trim();
+
+//     if (arrayStringFichero[i + 2] == "" || arrayStringFichero[i + 2] == undefined) {
+//       subtitles.push(new Subtitle(inicio, final, contenido));
+//       i += 4;
+
+
+//     }
+//     else if (arrayStringFichero[i + 3] == "" || arrayStringFichero[i + 3] == undefined) {
+//       contenido += " " + arrayStringFichero[i + 2].trim();
+//       subtitles.push(new Subtitle(inicio, final, contenido));
+//       i += 5;
+
+//     }
+//     else {
+//       contenido += " " + arrayStringFichero[i + 2].trim() + " " + arrayStringFichero[i + 3].trim();
+//       subtitles.push(new Subtitle(inicio, final, contenido));
+//       i += 6;
+//     }
+
+//   }
+
+//   return subtitles;
+
 // }
 
 /*//Objeto que modela el subtítulo SRT: la marca es su timeStamp en milisegundos, y el contenido es un string separando cada 
@@ -385,38 +423,45 @@ function toTimeStamp(ms) {
 //Funcionamiento: Devuelve un array de objetos "Subtitle" basándose en los subtítulos presentes en el fichero SRT
 function parseSRT(stringFichero) {
 
-
-  let arrayStringFichero = stringFichero.trim().split("\n");
-  for (let i = 0; i < arrayStringFichero.length; i++) {
-    arrayStringFichero[i] = arrayStringFichero[i].trim();
-  }
-
+  let arrayStringFichero = stringFichero.trim().split("\n").map(item => item.trim());
   let subtitles = [];
-  for (let i = 1; i < arrayStringFichero.length;) {
+  let inicio, final, contenido;
 
-    let inicio = toMiliSeconds(arrayStringFichero[i].match(regExpInicio)[0].trim());
-    let final = toMiliSeconds(arrayStringFichero[i].match(regExpFinal)[0].trim());
-    let contenido = arrayStringFichero[i + 1].trim();
-
-    if (arrayStringFichero[i + 2] == "" || arrayStringFichero[i + 2] == undefined) {
-      subtitles.push(new Subtitle(inicio, final, contenido));
-      i += 4;
-
-
+  for (let i = 0; i < arrayStringFichero.length;) {
+    
+    if (i == 0 || arrayStringFichero[i - 1] == "") {
+      i++;
     }
-    else if (arrayStringFichero[i + 3] == "" || arrayStringFichero[i + 3] == undefined) {
-      contenido += " " + arrayStringFichero[i + 2].trim();
-      subtitles.push(new Subtitle(inicio, final, contenido));
-      i += 5;
 
+    else if (arrayStringFichero[i] == "") {
+      subtitles.push(new Subtitle(inicio, final, contenido));
+      inicio = undefined;
+      final = undefined;
+      contenido = undefined;
+      i++;
     }
+
+    else if (arrayStringFichero[i].match(regExpInicio)) {
+      inicio = toMiliSeconds(arrayStringFichero[i].match(regExpInicio)[0].trim());
+      final = toMiliSeconds(arrayStringFichero[i].match(regExpFinal)[0].trim());
+      i++;
+    }
+
     else {
-      contenido += " " + arrayStringFichero[i + 2].trim() + " " + arrayStringFichero[i + 3].trim();
-      subtitles.push(new Subtitle(inicio, final, contenido));
-      i += 6;
+      if (contenido == undefined) {
+        contenido = arrayStringFichero[i].trim();
+      }
+      else {
+        contenido += " " + arrayStringFichero[i].trim();
+      }
+      if (i == (arrayStringFichero.length - 1)) {
+        subtitles.push(new Subtitle(inicio, final, contenido));
+      }
+      i++;
     }
 
   }
+
 
   return subtitles;
 
