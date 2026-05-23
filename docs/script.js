@@ -426,27 +426,34 @@ function parseSRT(stringFichero) {
   let arrayStringFichero = stringFichero.trim().split("\n").map(item => item.trim());
   let subtitles = [];
   let inicio, final, contenido;
+  let subtitulosDetectados = 0;
 
   for (let i = 0; i < arrayStringFichero.length;) {
-    
-    if (i == 0 || arrayStringFichero[i - 1] == "") {
+    //Esto detecta el número de cada subtitulo
+    if (i == 0 || (arrayStringFichero[i - 1] == "" && Number(arrayStringFichero[i]) != NaN && Number(arrayStringFichero[i]) != 0)) {
+      subtitulosDetectados++;
       i++;
     }
-
+    //Esto detecta los espacios en blanco entre subtitulos para crear un subtitulo cada vez que se encuentra uno
+    //Es robusto frente a subtítulos vacíos (en principio NUNCA te vas a encontrar subtitulos vacios en un SRT, pues no tiene sentido)
     else if (arrayStringFichero[i] == "") {
-      subtitles.push(new Subtitle(inicio, final, contenido));
-      inicio = undefined;
-      final = undefined;
-      contenido = undefined;
+      if (Number(arrayStringFichero[i + 1]) != NaN && Number(arrayStringFichero[i + 1]) != 0) {
+        subtitles.push(new Subtitle(inicio, final, contenido));
+        inicio = undefined;
+        final = undefined;
+        contenido = undefined;
+      }
+
       i++;
     }
-
+    //Esto detecta las marcas de tiempo del subtitulo
     else if (arrayStringFichero[i].match(regExpInicio)) {
       inicio = toMiliSeconds(arrayStringFichero[i].match(regExpInicio)[0].trim());
       final = toMiliSeconds(arrayStringFichero[i].match(regExpFinal)[0].trim());
       i++;
     }
-
+    //Esto detecta todo lo que sea contenido (incluso si el contenido es vacío: más adelante con el filter se quitan todos los subtitulos vaciós
+    //si es que los hubiera)
     else {
       if (contenido == undefined) {
         contenido = arrayStringFichero[i].trim();
@@ -462,6 +469,20 @@ function parseSRT(stringFichero) {
 
   }
 
+
+  console.log("Subtitulos detectados:" + subtitulosDetectados);
+  console.log("Cantidad de subtitulos reales:" + subtitles.length);
+
+  if (subtitulosDetectados == subtitles.length) {
+    console.log("Estructura SRT correcta.");
+
+  }
+  else {
+    console.log("Estructura SRT incorrecta");
+  }
+
+  //Esto es para quitar subtítulos que no tengan contenido (esto en principio no va a suceder NUNCA)
+  subtitles = subtitles.filter(item => item.contenido != undefined);
 
   return subtitles;
 
