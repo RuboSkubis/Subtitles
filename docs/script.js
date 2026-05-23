@@ -430,14 +430,20 @@ function parseSRT(stringFichero) {
 
   for (let i = 0; i < arrayStringFichero.length;) {
     //Esto detecta el número de cada subtitulo
-    if (i == 0 || (arrayStringFichero[i - 1] == "" && Number(arrayStringFichero[i]) != NaN && Number(arrayStringFichero[i]) != 0)) {
+    if (i == 0 ||
+      (arrayStringFichero[i - 1] == "" &&
+        Number(arrayStringFichero[i]) != NaN &&
+        Number(arrayStringFichero[i]) > 0) &&
+        arrayStringFichero[i+1].match(regExpInicio)) {
+
+      
       subtitulosDetectados++;
       i++;
     }
     //Esto detecta los espacios en blanco entre subtitulos para crear un subtitulo cada vez que se encuentra uno
     //Es robusto frente a subtítulos vacíos (en principio NUNCA te vas a encontrar subtitulos vacios en un SRT, pues no tiene sentido)
     else if (arrayStringFichero[i] == "") {
-      if (Number(arrayStringFichero[i + 1]) != NaN && Number(arrayStringFichero[i + 1]) != 0) {
+      if (Number(arrayStringFichero[i + 1]) != NaN && Number(arrayStringFichero[i + 1]) > 0) {
         subtitles.push(new Subtitle(inicio, final, contenido));
         inicio = undefined;
         final = undefined;
@@ -475,16 +481,18 @@ function parseSRT(stringFichero) {
 
   if (subtitulosDetectados == subtitles.length) {
     console.log("Estructura SRT correcta.");
+    //Esto es para quitar subtítulos que no tengan contenido (esto en principio no va a suceder NUNCA)
+    subtitles = subtitles.filter(item => item.contenido != undefined);
+
+    return subtitles;
 
   }
   else {
     console.log("Estructura SRT incorrecta");
+    return null;
   }
 
-  //Esto es para quitar subtítulos que no tengan contenido (esto en principio no va a suceder NUNCA)
-  subtitles = subtitles.filter(item => item.contenido != undefined);
 
-  return subtitles;
 
 }
 //Parámetros: array de objetos Subtitle
@@ -795,7 +803,13 @@ document.getElementById('inputfile')
       promesaDefichero.then(
         function (result) {
           subtitlesA = parseSRT(result);
-          write(firstOutPut, subtitlesA);
+          if (subtitlesA == null) {
+            alert("El fichero SRT no tiene internamente estructura de subtítulos SRT.")
+          }
+          else {
+            write(firstOutPut, subtitlesA);
+          }
+
         }
       );
     }
@@ -814,7 +828,12 @@ document.getElementById('secFile')
       promesaDefichero.then(
         function (result) {
           subtitlesB = parseSRT(result);
-          write(secondOutPut, subtitlesB);
+          if (subtitlesB == null) {
+            alert("El fichero SRT no tiene internamente estructura de subtítulos SRT.")
+          }
+          else {
+            write(secondOutPut, subtitlesB);
+          }
         }
       );
     }
