@@ -411,7 +411,7 @@ function parseSRT(stringFichero) {
 
     }
     else {
-      contenido += " " + arrayStringFichero[i + 2].trim() + " " + arrayStringFichero[i + 3];
+      contenido += " " + arrayStringFichero[i + 2].trim() + " " + arrayStringFichero[i + 3].trim();
       subtitles.push(new Subtitle(inicio, final, contenido));
       i += 6;
     }
