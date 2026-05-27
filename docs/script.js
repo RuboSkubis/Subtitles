@@ -379,7 +379,7 @@ function addDoublePersistance(subtitles, persistenceTime) {
 //Además, añade doble persistencia con "addDoublePersistence" la pérdida de milisegundos de subtítulos al eliminar los subtítulos "espúreos"
 function getSpecialSubtitles(subtitles) {
 
-  let ventanaEspureo = document.getElementById("espureo").value != "" ?  Number(document.getElementById("espureo").value): 1000;
+  let ventanaEspureo = document.getElementById("espureo").value != "" ? Number(document.getElementById("espureo").value) : 1000;
 
   let lonelySubtitles = subtitles.filter(function (item) {
 
@@ -548,24 +548,21 @@ document.getElementById("mergeButton")
 document.getElementById("opti")
   .addEventListener("change", function () {
     if (this.checked) {
-      document.getElementById("persistenceLabel").hidden = false;
-      document.getElementById("persistence").hidden = false;
 
-      document.getElementById("espureoLabel").hidden = false;
-      document.getElementById("espureo").hidden = false;
+      document.getElementById("persistence").disabled = false;
+      document.getElementById("espureo").disabled = false;
 
     }
     else {
-      document.getElementById("persistenceLabel").hidden = true;
-      document.getElementById("persistence").hidden = true;
+      document.getElementById("persistence").disabled = true;
+      document.getElementById("espureo").disabled = true;
       document.getElementById("persistence").value = "";
-
-      document.getElementById("espureoLabel").hidden = true;
-      document.getElementById("espureo").hidden = true;
       document.getElementById("espureo").value = "";
 
     }
   });
+
+
 
 
 
