@@ -286,6 +286,8 @@ function eventMerge(subtitlesA, subtitlesB) {
 
   return subtitlesC;
 }
+//Parámetro: array de objetos subtitle al que queremos añadir color
+//FUncionamiento: añado color al array de objetos subtitulo que se le pasa por parámetro
 function addColor(subtitles) {
   let colorA = document.getElementById("colorA").value;
   let colorB = document.getElementById("colorB").value;
