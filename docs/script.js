@@ -442,6 +442,8 @@ function getSpecialSubtitles(subtitles) {
 
   });
 
+  //Los siguientes logs y las variables de segundos (perdidos,antes, y después) son puramente para pruebas y comparar distintos resultados 
+  //al cambiar la ventana de subtítulo espúreo a eliminar.
   let media = Math.ceil(lonelySubtitles.reduce((sum, current) => sum + (current.final - current.inicio), 0) / (specialSubtitles.length - lonelyNecesarySubtitles.length));
   console.log("Media de tiempo perdido por subtítulo:" + media);
 
@@ -451,16 +453,37 @@ function getSpecialSubtitles(subtitles) {
   let segundosPerdidos = lonelySubtitles.reduce((sum, current) => sum + (current.final - current.inicio), 0) / 1000;
   let segundosAntes = subtitles.reduce((sum, current) => sum + (current.final - current.inicio), 0) / 1000;
   console.log("Porcentaje de tiempo perdido antes de añadir doble persistencia: " + ((segundosPerdidos / segundosAntes) * 100));
-  console.log("Segundos perdidos: " + segundosPerdidos);
+  console.log("Segundos perdidos antes de la doble persistencia: " + segundosPerdidos);
 
   addDoublePersistance(specialSubtitles, media);
 
 
   let segundosDespues = specialSubtitles.reduce((sum, current) => sum + (current.final - current.inicio), 0) / 1000;
   console.log("Porcentaje de tiempo perdido después de añadir doble persistencia: " + (100 - (segundosDespues / segundosAntes) * 100));
-  console.log("Segundos perdidos: " + (segundosAntes - segundosDespues));
+  console.log("Segundos perdidos después de la doble persistencia: " + (segundosAntes - segundosDespues));
 
   return specialSubtitles;
+}
+//Parámetros:array de objetos subtitle
+//Funcionamiento: devuelve true o false según haya continuidad temporal en el array del parámetro(esto es para hacer pruebas)
+function isContinuous(subtitles) {
+
+  let esContinuo = true;
+
+  for (let i = 0; i < subtitles.length; i++) {
+    if (subtitles[i].inicio > subtitles[i].final) {
+      esContinuo = false;
+      break;
+    }
+
+    if ((i != subtitles.length - 1) && subtitles[i].final > subtitles[i + 1].inicio) {
+      esContinuo = false;
+      break;
+    }
+
+  }
+  return esContinuo;
+
 }
 //Funcionamiento: hace que se pueda meter en el primer input file un fichero (idioma A), y después lo imprime en la ventana del navegador para ver 
 //el resultado del parseo, dejando cada subtítulo como una sola línea
@@ -524,12 +547,11 @@ document.getElementById("mergeButton")
       subtitlesC = eventMerge(subtitlesA, subtitlesB);
 
       if (document.getElementById("opti").checked) {
-
         subtitlesC = getSpecialSubtitles(subtitlesC);
       }
+
       if (document.getElementById("persistence").value != "") {
         addPersistence(subtitlesC, Number(document.getElementById("persistence").value));
-
       }
       addColor(subtitlesC);
 
@@ -542,6 +564,7 @@ document.getElementById("mergeButton")
     else {
       alert("Tienes que meter dos ficheros.");
     }
+    console.log("¿Hay continuidad en el resultado?: " + isContinuous(subtitlesC));
   });
 //Funcionamiento:hace que marcar la opción de "Eliminar subtítulos solitarios" habilite o deshabilite el modo persistencia, ya que 
 //el modo persistencia solo tiene sentido en caso de seleccionar la opción "Eliminar subtítulos solitarios"
