@@ -96,6 +96,7 @@ document.getElementById("mergeButton")
       nombreFichero += ".srt";
       download(unParseSRT(subtitlesC), nombreFichero);
     }
+    
     else {
       alert("Tienes que meter dos ficheros.");
     }
