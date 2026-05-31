@@ -26,16 +26,24 @@ document.getElementById('inputfile')
   .addEventListener('change', function () {
 
     if (this.files[0].name.includes(".srt")) {
-      let promesaDefichero = read(this);
 
+      let promesaDefichero = read(this);
       promesaDefichero.then(
         function (result) {
-          subtitlesA = parseSRT(result);
-          if (subtitlesA == null) {
-            alert("El fichero SRT no tiene internamente estructura de subtítulos SRT.")
+          try {
+            let decoder = new TextDecoder(document.getElementById("codA").value, { fatal: true });
+            let uint8Array = new Uint8Array(result);
+            let str = decoder.decode(result)
+            subtitlesA = parseSRT(str);
+            if (subtitlesA == null) {
+              alert("El fichero SRT no tiene internamente estructura de subtítulos SRT.")
+            }
+            else {
+              write(firstOutPut, subtitlesA);
+            }
           }
-          else {
-            write(firstOutPut, subtitlesA);
+          catch (error) {
+            alert("La codificación utilizada para el idioma superior no es la correcta. Pruebe otra.");
           }
 
         }
@@ -52,15 +60,22 @@ document.getElementById('secFile')
   .addEventListener('change', function () {
     if (this.files[0].name.includes(".srt")) {
       let promesaDefichero = read(this);
-
       promesaDefichero.then(
         function (result) {
-          subtitlesB = parseSRT(result);
-          if (subtitlesB == null) {
-            alert("El fichero SRT no tiene internamente estructura de subtítulos SRT.")
+          try {
+            let decoder = new TextDecoder(document.getElementById("codB").value, { fatal: true });
+            let uint8Array = new Uint8Array(result);
+            let str = decoder.decode(result)
+            subtitlesB = parseSRT(str);
+            if (subtitlesB == null) {
+              alert("El fichero SRT no tiene internamente estructura de subtítulos SRT.")
+            }
+            else {
+              write(secondOutPut, subtitlesB);
+            }
           }
-          else {
-            write(secondOutPut, subtitlesB);
+          catch(error){
+            alert("La codificación seleccionada para el idioma inferior no es adecuada. Pruebe otra")
           }
         }
       );
@@ -96,7 +111,7 @@ document.getElementById("mergeButton")
       nombreFichero += ".srt";
       download(unParseSRT(subtitlesC), nombreFichero);
     }
-    
+
     else {
       alert("Tienes que meter dos ficheros.");
     }

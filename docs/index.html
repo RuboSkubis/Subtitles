@@ -20,10 +20,10 @@
     <input type="checkbox" id="opti">
     <label for="opti">Eliminar subtítulos solitarios.</label>
 
-    <label for="persistence" id="persistenceLabel" >Persistencia (segundos):</label>
+    <label for="persistence" id="persistenceLabel">Persistencia (segundos):</label>
     <input type="number" id="persistence" disabled>
 
-    <label for="espureo" id="espureoLabel">Milisegundos de la ventana de subtitulo espúreo 
+    <label for="espureo" id="espureoLabel">Milisegundos de la ventana de subtitulo espúreo
         (se recomienda un valor de entre 1000 y 1500, siendo preferible 1000)</label>
     <input type="number" id="espureo" step="100" disabled>
 
@@ -32,6 +32,20 @@
 
     <label for="colorB">Color idioma inferior: </label>
     <input type="color" id="colorB" value="#ffffff">
+
+    <label for="codA">Codificación del idioma A: </label>
+    <select name="codificacionA" id="codA">
+        <option value="utf-8" selected>UTF-8</option>
+        <option value="windows-1252">Windows 1252</option>
+        <option value="iso-8859-1">ISO 8859-1</option>
+    </select>
+
+    <label for="codB">Codificación del idioma B: </label>
+    <select name="codificacionB" id="codB">
+        <option value="utf-8" selected>UTF-8</option>
+        <option value="windows-1252">Windows 1252</option>
+        <option value="iso-8859-1">ISO 8859-1</option>
+    </select>
 
 
     <a href="" hidden id="descarga">Descarga</a>

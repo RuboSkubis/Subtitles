@@ -370,3 +370,19 @@
 
 //   return subtitlesC;
 // }
+
+
+// export async function read(entrada,codificacion) {
+//     let promesaDefichero = new Promise(function (resolve) {
+//         let fr = new FileReader();
+
+//         fr.onload = function () {
+            
+//             resolve(fr.result);
+//         }
+
+//         fr.readAsText(entrada.files[0],codificacion);
+//     });
+
+//     return await promesaDefichero;
+// }

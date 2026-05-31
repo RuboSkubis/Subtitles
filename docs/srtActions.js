@@ -6,19 +6,23 @@ const regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
 
 //Parámetro: <input type="file">
 //Funcionamiento: Devuelve una promesa cuyo resultado es el contenido del fichero srt en una variable string
-export async function read(entrada) {
+
+
+export async function read(entrada,codificacion) {
     let promesaDefichero = new Promise(function (resolve) {
         let fr = new FileReader();
 
         fr.onload = function () {
+            
             resolve(fr.result);
         }
 
-        fr.readAsBinaryString(entrada.files[0]);
+        fr.readAsArrayBuffer(entrada.files[0]);
     });
 
     return await promesaDefichero;
 }
+
 //Parámetro: cadena en formato XX:XX:XX,XXX (timestamp)
 //Funcionamiento: devuelve la cantidad de milisegundos correspondiente al timestamp
 export function toMiliSeconds(timeStamp) {
