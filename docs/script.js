@@ -1,5 +1,6 @@
 import Subtitle from './Subtitle.js';
 import Evento from './Evento.js';
+import MergedSubtitle from './MergedSubtitle.js';
 import {
   read, toMiliSeconds, toTimeStamp, parseSRT, unParseMergedSRT, write, eventMerge, download, addPersistence,
   optSubtitles, isContinuous
