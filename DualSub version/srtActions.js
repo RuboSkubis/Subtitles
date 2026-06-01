@@ -1,5 +1,6 @@
 import Subtitle from './Subtitle.js';
 import Evento from './Evento.js';
+import mergedSubtitle from './mergedSubtitle.js';
 
 const regExpInicio = /\d{2}:\d{2}:\d{2},\d{3}./;
 const regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
@@ -8,12 +9,12 @@ const regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
 //Funcionamiento: Devuelve una promesa cuyo resultado es el contenido del fichero srt en una variable string
 
 
-export async function read(entrada,codificacion) {
+export async function read(entrada, codificacion) {
     let promesaDefichero = new Promise(function (resolve) {
         let fr = new FileReader();
 
         fr.onload = function () {
-            
+
             resolve(fr.result);
         }
 
@@ -142,6 +143,8 @@ export function parseSRT(stringFichero) {
         //Esto es para quitar subtítulos que no tengan contenido (esto en principio no va a suceder NUNCA)
         subtitles = subtitles.filter(item => item.contenido != undefined);
 
+
+
         return subtitles;
 
     }
@@ -159,7 +162,7 @@ export function unParseSRT(subtitles) {
     let unParsedSRT = "";
     for (let i = 0; i < subtitles.length; i++) {
 
-        unParsedSRT += (i + 1) + "\n" + toTimeStamp(subtitles[i].inicio) + " --> " + toTimeStamp(subtitles[i].final) + "\n" + subtitles[i].contenido + "\n\n";
+        unParsedSRT += (i + 1) + "\n" + toTimeStamp(subtitles[i].inicio) + " --> " + toTimeStamp(subtitles[i].final) + "\n" + subtitles[i].contenidoA + "\n" + subtitles[i].contenidoB + "\n\n";
 
     }
     return unParsedSRT;
@@ -168,14 +171,19 @@ export function unParseSRT(subtitles) {
 //Funcionamiento: (se presupone outPut = etiqueta <pre>)imprime en output lo que se imprimiría en el fichero SRT basándose
 //en un array de objetos "Subtitle"
 export function write(outPut, subtitles) {
-
     outPut.textContent = "";
-    for (let i = 0; i < subtitles.length; i++) {
 
-        outPut.textContent += (i + 1) + "\n" + toTimeStamp(subtitles[i].inicio) + " --> " + toTimeStamp(subtitles[i].final) + "\n" + subtitles[i].contenido + "\n\n";
-
+    if (subtitles[0] instanceof Subtitle) {
+        for (let i = 0; i < subtitles.length; i++) {
+            outPut.textContent += (i + 1) + "\n" + toTimeStamp(subtitles[i].inicio) + " --> " + toTimeStamp(subtitles[i].final) + "\n" + subtitles[i].contenido + "\n\n";
+        }
     }
 
+    else {
+        for (let i = 0; i < subtitles.length; i++) {
+            outPut.textContent += (i + 1) + "\n" + toTimeStamp(subtitles[i].inicio) + " --> " + toTimeStamp(subtitles[i].final) + "\n" + subtitles[i].contenidoA + "\n" + subtitles[i].contenidoB + "\n\n";
+        }
+    }
 
 }
 //Parámetros: dos arrays de objetos Subtitulos para fusionar
@@ -209,7 +217,7 @@ export function eventMerge(subtitlesA, subtitlesB) {
 
         if (prevTime != event.marca) {
             if (!(activeA[0] == "-" && activeB[0] == "-")) {
-                subtitlesC.push(new Subtitle(prevTime, event.marca, activeA.join(" ") + "\n" + activeB.join(" ")));
+                subtitlesC.push(new mergedSubtitle(prevTime, event.marca, activeA.join(" "), activeB.join(" ")));
             }
 
         }
@@ -268,23 +276,14 @@ export function addColor(subtitles) {
     let colorB = document.getElementById("colorB").value;
 
     if (colorA != "#ffffff") {
-
-        let contenidoA = "";
         for (let i = 0; i < subtitles.length; i++) {
-            contenidoA = subtitles[i].contenido.split("\n")[0];
-
-            contenidoA = "<font color ='" + colorA + "'>" + contenidoA + "</font>";
-            subtitles[i].contenido = contenidoA + "\n" + subtitles[i].contenido.split("\n")[1];
+            subtitles[i].contenidoA = "<font color ='" + colorA + "'>" + subtitles[i].contenidoA + "</font>";
         }
     }
+
     if (colorB != "#ffffff") {
-
-        let contenidoB = "";
         for (let i = 0; i < subtitles.length; i++) {
-            contenidoB = subtitles[i].contenido.split("\n")[1];
-
-            contenidoB = "<font color ='" + colorB + "'>" + contenidoB + "</font>";
-            subtitles[i].contenido = subtitles[i].contenido.split("\n")[0] + "\n" + contenidoB;
+            subtitles[i].contenidoA = "<font color ='" + colorA + "'>" + subtitles[i].contenidoA + "</font>";
         }
     }
 }
@@ -294,7 +293,7 @@ export function download(data, filename) {
 
     let enlaceDeDescarga = document.getElementById("descarga");
     enlaceDeDescarga.download = filename;
-    enlaceDeDescarga.style.visibility ="visible";
+    enlaceDeDescarga.style.visibility = "visible";
 
     let blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
     enlaceDeDescarga.href = URL.createObjectURL(blob);
@@ -309,19 +308,20 @@ export function download(data, filename) {
 //Funcionamiento:añade persistencia al array de subtitulos que se pasa por parámetro.
 export function addPersistence(subtitles, persistenceTime) {
 
-    for (let i = 0; i < subtitles.length - 1; i++) {
-        if ((subtitles[i].contenido.includes("-\n") || subtitles[i].contenido.at(-2) == "\n") && !subtitles[i].contenido.match(/-.{1,}-\n/)) {
-            continue;
-        }
-        if (subtitles[i + 1].inicio - subtitles[i].final > (persistenceTime * 1000)) {
+    if (persistenceTime != 0) {
+        for (let i = 0; i < subtitles.length - 1; i++) {
 
-            subtitles[i].final += (persistenceTime * 1000);
-        }
-        else if (subtitles[i].final != subtitles[i + 1].inicio) {
-            subtitles[i].final += (subtitles[i + 1].inicio - subtitles[i].final - 20);
+            if (subtitles[i + 1].inicio - subtitles[i].final > (persistenceTime * 1000)) {
 
+                subtitles[i].final += (persistenceTime * 1000);
+            }
+            else if (subtitles[i].final != subtitles[i + 1].inicio) {
+                subtitles[i].final += (subtitles[i + 1].inicio - subtitles[i].final - 20);
+
+            }
         }
     }
+
 }
 //Parámetros: array de objetos subtitle y tiempo de persistencia (hacia los lados)
 //Funcionamiento: similar a la función addPersistence, pero en su lugar añade persistencia al principio y al final de cada subtítulo
@@ -354,90 +354,305 @@ export function addDoublePersistance(subtitles, persistenceTime) {
 //Parámetros: array de objetos subtitle
 //Funcionamiento: devuelve un array de objetos subtitle, pero habiendo quitado aquellos subtitulos en los que solo hay un idioma y la duracion es menor a 1 segundo
 //Además, añade doble persistencia con "addDoublePersistence" la pérdida de milisegundos de subtítulos al eliminar los subtítulos "espúreos"
-export function getSpecialSubtitles(subtitles,ventanaEspureo) {
+export function getSpecialSubtitles(subtitles, optMode) {
 
-    
+    let specialSubtitles = [];
 
-    let lonelySubtitles = subtitles.filter(function (item) {
+    if (optMode == "prioridadSuperior") {
 
-        if (item.contenido.match(/-/)) {
-            if (item.contenido.includes("-\n") && (item.final - item.inicio < ventanaEspureo) && !item.contenido.match(/-.{1,}-\n/)) {
-                return true;
+        for (let i = 0; i < subtitles.length; i++) {
+            if (!((subtitles[i].contenidoA == "-" && subtitles[i].contenidoB != "-") || (subtitles[i].contenidoB == "-" && subtitles[i].contenidoA != "-"))) {
+                if (i > 0) {
+                    if (subtitles[i - 1].contenidoA == subtitles[i].contenidoA && subtitles[i - 1].contenidoB == "-") {
+                        if (i > 1) {
+                            if (subtitles[i - 2].final != subtitles[i - 1].final) {
+                                subtitles[i].inicio = subtitles[i - 1].inicio;
+                            }
+                        }
+                        else {
+                            subtitles[i].inicio = subtitles[i - 1].inicio;
+                        }
+                    }
+                }
+                if (i < subtitles.length - 1) {
+                    if (subtitles[i + 1].contenidoA == subtitles[i].contenidoA && subtitles[i + 1].contenidoB == "-") {
+                        subtitles[i].final = subtitles[i + 1].final;
+                    }
+                }
             }
-            else if (item.contenido.at(-2) == "\n" && (item.final - item.inicio < ventanaEspureo)) {
-                return true;
+        }
+        //Esto para quitar subtitulos espureos del idioma al que se da priorridad
+        specialSubtitles = subtitles.filter(function (item, index, array) {
+            if (index > 0 && index < array.length - 1) {
+                if ((item.inicio >= array[index - 1].inicio && item.final <= array[index - 1].final) || (item.inicio >= array[index + 1].inicio && item.final <= array[index + 1].final)) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+
+            else if (index == 0) {
+                if (item.inicio >= array[index + 1].inicio && item.final <= array[index + 1].final) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
             }
             else {
-                return false;
+                if (item.inicio >= array[index - 1].inicio && item.final <= array[index - 1].final) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+        });
+        //Esto para quitar los subtitulos espureos que quedan, es decir los del idioma al que no se da prioridad, y manteniendo los subtítulos que 
+        //están solamente en un idioma
+        specialSubtitles = specialSubtitles.filter(function (item, index, array) {
+            if (item.contenidoA == "-" && item.contenidoB != "-") {
+                if (index > 0 && index < array.length - 1) {
+                    if (item.contenidoB == array[index + 1].contenidoB || item.contenidoB == array[index - 1].contenidoB) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+                else if (index == 0) {
+                    if (item.contenidoB == array[index + 1].contenidoB) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+                else {
+                    if (item.contenidoB == array[index - 1].contenidoB) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+            }
+            else {
+                return true;
+            }
+        });
+    }
+
+    else if (optMode == "prioridadInferior") {
+        for (let i = 0; i < subtitles.length; i++) {
+
+            if (!((subtitles[i].contenidoA == "-" && subtitles[i].contenidoB != "-") || (subtitles[i].contenidoB == "-" && subtitles[i].contenidoA != "-"))) {
+                if (i > 0) {
+                    if (subtitles[i - 1].contenidoB == subtitles[i].contenidoB && subtitles[i - 1].contenidoA == "-") {
+                        if (i > 1) {
+                            if (subtitles[i - 2].final != subtitles[i - 1].final) {
+                                subtitles[i].inicio = subtitles[i - 1].inicio;
+                            }
+                        }
+                        else {
+                            subtitles[i].inicio = subtitles[i - 1].inicio;
+                        }
+                    }
+                }
+
+                if (i < subtitles.length - 1) {
+                    if (subtitles[i + 1].contenidoB == subtitles[i].contenidoB && subtitles[i + 1].contenidoA == "-") {
+                        subtitles[i].final = subtitles[i + 1].final;
+                    }
+                }
+            }
+        }
+
+        //Esto para quitar subtitulos espureos del idioma al que se da priorridad
+        specialSubtitles = subtitles.filter(function (item, index, array) {
+            if (index > 0 && index < array.length - 1) {
+                if ((item.inicio >= array[index - 1].inicio && item.final <= array[index - 1].final) || (item.inicio >= array[index + 1].inicio && item.final <= array[index + 1].final)) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
             }
 
-        }
-        else {
-            return false;
-        }
-
-    });
-
-    let specialSubtitles = subtitles.filter(function (item) {
-
-        if (item.contenido.match(/-/)) {
-            if (item.contenido.includes("-\n") && (item.final - item.inicio < ventanaEspureo) && !item.contenido.match(/-.{1,}-\n/)) {
-                return false;
+            else if (index == 0) {
+                if (item.inicio >= array[index + 1].inicio && item.final <= array[index + 1].final) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
             }
-            else if (item.contenido.at(-2) == "\n" && (item.final - item.inicio < ventanaEspureo)) {
-                return false;
+            else {
+                if (item.inicio >= array[index - 1].inicio && item.final <= array[index - 1].final) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+        });
+        //Esto para quitar los subtitulos espureos que quedan, es decir los del idioma al que no se da prioridad, y manteniendo los subtítulos que 
+        //están solamente en un idioma
+        specialSubtitles = specialSubtitles.filter(function (item, index, array) {
+            if (item.contenidoB == "-" && item.contenidoA != "-") {
+                if (index > 0 && index < array.length - 1) {
+                    if (item.contenidoA == array[index + 1].contenidoA || item.contenidoA == array[index - 1].contenidoA) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+                else if (index == 0) {
+                    if (item.contenidoA == array[index + 1].contenidoA) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+                else {
+                    if (item.contenidoA == array[index - 1].contenidoA) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                }
             }
             else {
                 return true;
             }
+        });
+    }
 
-        }
-        else {
-            return true;
-        }
+    else if (optMode == "prioridadMaximizar") {
+        for (let i = 0; i < subtitles.length; i++) {
 
-    });
-
-    let lonelyNecesarySubtitles = specialSubtitles.filter(function (item) {
-
-
-        if (item.contenido.match(/-/)) {
-            if (item.contenido.includes("-\n") && !item.contenido.match(/-.{1,}-\n/)) {
-                return true;
+            if (!((subtitles[i].contenidoA == "-" && subtitles[i].contenidoB != "-") || (subtitles[i].contenidoB == "-" && subtitles[i].contenidoA != "-"))) {
+                if (i > 0) {
+                    if ((subtitles[i - 1].contenidoA == subtitles[i].contenidoA && subtitles[i - 1].contenidoB == "-") || (subtitles[i - 1].contenidoB == subtitles[i].contenidoB && subtitles[i - 1].contenidoA == "-")) {
+                        if (i > 1) {
+                            if (subtitles[i - 2].final != subtitles[i - 1].final) {
+                                subtitles[i].inicio = subtitles[i - 1].inicio;
+                            }
+                        }
+                        else {
+                            subtitles[i].inicio = subtitles[i - 1].inicio;
+                        }
+                    }
+                }
+                if (i < subtitles.length - 1) {
+                    if ((subtitles[i + 1].contenidoA == subtitles[i].contenidoA && subtitles[i + 1].contenidoB == "-") || (subtitles[i + 1].contenidoB == subtitles[i].contenidoB && subtitles[i + 1].contenidoA == "-")) {
+                        subtitles[i].final = subtitles[i + 1].final;
+                    }
+                }
             }
-            else if (item.contenido.at(-2) == "\n") {
-                return true;
+        }
+        //Esto para quitar subtitulos espureos del idioma al que se da priorridad
+        specialSubtitles = subtitles.filter(function (item, index, array) {
+            if (index > 0 && index < array.length - 1) {
+                if ((item.inicio >= array[index - 1].inicio && item.final <= array[index - 1].final) || (item.inicio >= array[index + 1].inicio && item.final <= array[index + 1].final)) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+
+            else if (index == 0) {
+                if (item.inicio >= array[index + 1].inicio && item.final <= array[index + 1].final) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
             }
             else {
-                return false;
+                if (item.inicio >= array[index - 1].inicio && item.final <= array[index - 1].final) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
             }
+        });
+    }
 
+    else {
+        for (let i = 0; i < subtitles.length; i++) {
+
+            if (!((subtitles[i].contenidoA == "-" && subtitles[i].contenidoB != "-") || (subtitles[i].contenidoB == "-" && subtitles[i].contenidoA != "-"))) {
+
+
+                specialSubtitles = subtitles.filter(function (item, index, array) {
+                    if ((item.contenidoA == "-" && item.contenidoB != "-")) {
+                        if (index > 0 && index < array.length - 1) {
+                            if (item.contenidoB == array[index + 1].contenidoB || item.contenidoB == array[index - 1].contenidoB) {
+                                return false;
+                            }
+                            else {
+                                return true;
+                            }
+                        }
+                        else if (index == 0) {
+                            if (item.contenidoB == array[index + 1].contenidoB) {
+                                return false;
+                            }
+                            else {
+                                return true;
+                            }
+                        }
+                        else {
+                            if (item.contenidoB == array[index - 1].contenidoB) {
+                                return false;
+                            }
+                            else {
+                                return true;
+                            }
+                        }
+                    }
+                    else if (item.contenidoB == "-" && item.contenidoA != "-") {
+                        if (index > 0 && index < array.length - 1) {
+                            if (item.contenidoA == array[index + 1].contenidoA || item.contenidoA == array[index - 1].contenidoA) {
+                                return false;
+                            }
+                            else {
+                                return true;
+                            }
+                        }
+                        else if (index == 0) {
+                            if (item.contenidoA == array[index + 1].contenidoA) {
+                                return false;
+                            }
+                            else {
+                                return true;
+                            }
+                        }
+                        else {
+                            if (item.contenidoA == array[index - 1].contenidoA) {
+                                return false;
+                            }
+                            else {
+                                return true;
+                            }
+                        }
+                    }
+                    else {
+                        return true;
+                    }
+                });
+            }
         }
-        else {
-            return false;
-        }
-
-    });
-
-    //Los siguientes logs y las variables de segundos (perdidos,antes, y después) son puramente para pruebas y comparar distintos resultados 
-    //al cambiar la ventana de subtítulo espúreo a eliminar.
-    let media = Math.ceil(lonelySubtitles.reduce((sum, current) => sum + (current.final - current.inicio), 0) / (specialSubtitles.length - lonelyNecesarySubtitles.length));
-    console.log("Media de tiempo perdido por subtítulo:" + media);
-
-    media = Math.ceil(media / 2);
-    console.log("Media por los lados:" + media);
-
-    let segundosPerdidos = lonelySubtitles.reduce((sum, current) => sum + (current.final - current.inicio), 0) / 1000;
-    let segundosAntes = subtitles.reduce((sum, current) => sum + (current.final - current.inicio), 0) / 1000;
-    console.log("Porcentaje de tiempo perdido antes de añadir doble persistencia: " + ((segundosPerdidos / segundosAntes) * 100));
-    console.log("Segundos perdidos antes de la doble persistencia: " + segundosPerdidos);
-
-    addDoublePersistance(specialSubtitles, media);
+    }
 
 
-    let segundosDespues = specialSubtitles.reduce((sum, current) => sum + (current.final - current.inicio), 0) / 1000;
-    console.log("Porcentaje de tiempo perdido después de añadir doble persistencia: " + (100 - (segundosDespues / segundosAntes) * 100));
-    console.log("Segundos perdidos después de la doble persistencia: " + (segundosAntes - segundosDespues));
 
     return specialSubtitles;
 }
