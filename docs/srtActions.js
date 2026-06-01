@@ -5,10 +5,9 @@ import mergedSubtitle from './mergedSubtitle.js';
 const regExpInicio = /\d{2}:\d{2}:\d{2},\d{3}./;
 const regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
 
+
 //Parámetro: <input type="file">
 //Funcionamiento: Devuelve una promesa cuyo resultado es el contenido del fichero srt en una variable string
-
-
 export async function read(entrada, codificacion) {
     let promesaDefichero = new Promise(function (resolve) {
         let fr = new FileReader();
@@ -23,7 +22,6 @@ export async function read(entrada, codificacion) {
 
     return await promesaDefichero;
 }
-
 //Parámetro: cadena en formato XX:XX:XX,XXX (timestamp)
 //Funcionamiento: devuelve la cantidad de milisegundos correspondiente al timestamp
 export function toMiliSeconds(timeStamp) {
@@ -319,34 +317,6 @@ export function addPersistence(subtitles, persistenceTime) {
                 subtitles[i].final += (subtitles[i + 1].inicio - subtitles[i].final - 20);
 
             }
-        }
-    }
-
-}
-//Parámetros: array de objetos subtitle y tiempo de persistencia (hacia los lados)
-//Funcionamiento: similar a la función addPersistence, pero en su lugar añade persistencia al principio y al final de cada subtítulo
-//En principio está funcio está solamente para ser utilizada al seleccionar el modo "eliminar subtitulos solitarios", ya que sirve 
-//para "recuperar algo de tiempo" de subitulo cuando hemos eliminado los subtítulos "espúreos"
-export function addDoublePersistance(subtitles, persistenceTime) {
-
-    for (let i = 0; i < subtitles.length - 1; i++) {
-        if ((subtitles[i].contenido.includes("-\n") || subtitles[i].contenido.at(-2) == "\n") && !subtitles[i].contenido.match(/-.{1,}-\n/)) {
-            continue;
-        }
-        else {
-            if (subtitles[i + 1].inicio - subtitles[i].final > persistenceTime) {
-                subtitles[i].final += persistenceTime;
-            }
-
-            if (i > 0) {
-                if (subtitles[i].inicio - subtitles[i - 1].final > persistenceTime) {
-                    subtitles[i].inicio = subtitles[i].inicio - persistenceTime;
-                }
-                else {
-                    subtitles[i].inicio = subtitles[i - 1].final;
-                }
-            }
-
         }
     }
 
