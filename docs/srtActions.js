@@ -354,9 +354,9 @@ export function addDoublePersistance(subtitles, persistenceTime) {
 //Parámetros: array de objetos subtitle
 //Funcionamiento: devuelve un array de objetos subtitle, pero habiendo quitado aquellos subtitulos en los que solo hay un idioma y la duracion es menor a 1 segundo
 //Además, añade doble persistencia con "addDoublePersistence" la pérdida de milisegundos de subtítulos al eliminar los subtítulos "espúreos"
-export function getSpecialSubtitles(subtitles) {
+export function getSpecialSubtitles(subtitles,ventanaEspureo) {
 
-    let ventanaEspureo = document.getElementById("espureo").value != "" ? Number(document.getElementById("espureo").value) : 1000;
+    
 
     let lonelySubtitles = subtitles.filter(function (item) {
 

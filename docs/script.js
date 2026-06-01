@@ -97,10 +97,8 @@ document.getElementById("mergeButton")
       subtitlesC = eventMerge(subtitlesA, subtitlesB);
 
       if (document.getElementById("opti").checked) {
-        subtitlesC = getSpecialSubtitles(subtitlesC);
-      }
-
-      if (!document.getElementById("persistence").disabled) {
+        let ventanaEspureo = document.getElementById("espureo").value != "" ? Number(document.getElementById("espureo").value) : 1000;
+        subtitlesC = getSpecialSubtitles(subtitlesC,ventanaEspureo);
         addPersistence(subtitlesC, Number(document.getElementById("persistence").value));
       }
       addColor(subtitlesC);
