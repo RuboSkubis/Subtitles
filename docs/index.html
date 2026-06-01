@@ -15,18 +15,17 @@
             <input type="file" name="secFile" id="secFile">
 
 
-            <label for="opti">Eliminar subtítulos espúreos. <input type="checkbox" id="opti">
+            <label for="opti">Modo optimizado.<input type="checkbox" id="opti">
             </label>
+
+            <label for="prioridadSuperior"><input type="radio" id="prioridadSuperior" name="prioridad" value="prioridadSuperior" disabled checked>Prioridad de los subtítulos superiores</label>
+            <label for="prioridadInferior"><input type="radio" id="prioridadInferior" name="prioridad" value="prioridadInferior" disabled>Prioridad de los subtítulos inferiores</label>
+            <label for="prioridadMaximizar"><input type="radio" id="prioridadMaximizar" name="prioridad" value="prioridadMaximizar" disabled>Maximizar tiempo</label>
+            <label for="prioridadMinimizar"><input type="radio" id="prioridadMinimizar" name="prioridad" value="prioridadMinimizar" disabled>Minimizar tiempo</label>
 
             <label for="persistence" id="persistenceLabel">Persistencia (segundos):<input type="number" id="persistence"
                     disabled min="1">
             </label>
-
-
-            <label for="espureo" id="espureoLabel">Ventana de subtitulo espúreo (milisegundos):<input type="number"
-                    id="espureo" step="100" disabled min="200" max="1500" value="1000">
-            </label>
-
 
             <label for="colorA">Color idioma superior:
                 <input type="color" id="colorA" value="#ffffff">
@@ -58,9 +57,9 @@
             <button type="button" id="mergeButton">Merge</button>
             <a href="" id="descarga">Descarga</a>
 
-            
+
         </div>
-        
+
 
         <pre id="output"></pre>
         <pre id="secOutPut"></pre>

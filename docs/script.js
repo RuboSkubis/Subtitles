@@ -35,6 +35,7 @@ document.getElementById('inputFile')
             let uint8Array = new Uint8Array(result);
             let str = decoder.decode(result)
             subtitlesA = parseSRT(str);
+            
             if (subtitlesA == null) {
               alert("El fichero SRT no tiene internamente estructura de subtítulos SRT.")
             }
@@ -96,9 +97,11 @@ document.getElementById("mergeButton")
 
       subtitlesC = eventMerge(subtitlesA, subtitlesB);
 
+
+
       if (document.getElementById("opti").checked) {
-        let ventanaEspureo = document.getElementById("espureo").value != "" ? Number(document.getElementById("espureo").value) : 1000;
-        subtitlesC = getSpecialSubtitles(subtitlesC,ventanaEspureo);
+        let optMode = Array.from(document.getElementsByName("prioridad")).find(item => item.checked == true).value;
+        subtitlesC = getSpecialSubtitles(subtitlesC, optMode);
         addPersistence(subtitlesC, Number(document.getElementById("persistence").value));
       }
       addColor(subtitlesC);
@@ -120,29 +123,37 @@ document.getElementById("mergeButton")
 document.getElementById("opti")
   .addEventListener("change", function () {
     if (this.checked) {
-
       document.getElementById("persistence").disabled = false;
-      document.getElementById("espureo").disabled = false;
-
+      document.getElementById("prioridadSuperior").disabled = false;
+      document.getElementById("prioridadInferior").disabled = false;
+      document.getElementById("prioridadMaximizar").disabled = false;
+      document.getElementById("prioridadMinimizar").disabled = false;
     }
+
     else {
       document.getElementById("persistence").disabled = true;
-      document.getElementById("espureo").disabled = true;
       document.getElementById("persistence").value = "";
-      document.getElementById("espureo").value = "1000";
-
+      document.getElementById("prioridadSuperior").disabled = true;
+      document.getElementById("prioridadInferior").disabled = true;
+      document.getElementById("prioridadMaximizar").disabled = true;
+      document.getElementById("prioridadMinimizar").disabled = true;
     }
   });
-
-document.getElementById("espureo")
-  .addEventListener("keydown", function (event) {
-    event.preventDefault();
-  });
-
 document.getElementById("persistence")
   .addEventListener("keydown", function (event) {
     event.preventDefault();
   });
+
+
+
+
+
+
+
+
+
+
+
 
 
 
