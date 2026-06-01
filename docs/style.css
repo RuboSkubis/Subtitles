@@ -1,11 +1,21 @@
-    #container{
+    #container {
       display: flex;
     }
-    pre{
-      margin:10px;
+
+    pre {
+      margin: 10px;
     }
 
 
-    #inputFile,#secFile{
-      max-width:200px;
+    #inputFile,
+    #secFile {
+      max-width: 200px;
+    }
+
+    #inputContainer > * {
+      display: block;
+      margin-bottom: 20px;
+    }
+    #descarga{
+      visibility:hidden;
     }

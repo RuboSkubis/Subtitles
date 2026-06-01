@@ -294,7 +294,7 @@ export function download(data, filename) {
 
     let enlaceDeDescarga = document.getElementById("descarga");
     enlaceDeDescarga.download = filename;
-    enlaceDeDescarga.hidden = false;
+    enlaceDeDescarga.style.visibility ="visible";
 
     let blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
     enlaceDeDescarga.href = URL.createObjectURL(blob);

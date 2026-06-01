@@ -9,55 +9,63 @@
 </head>
 
 <body>
-
-    <input type="file" name="inputfile" id="inputFile">
-    <input type="file" name="secFile" id="secFile">
-
-    <button type="button" id="mergeButton">Merge</button>
-
-
-
-    <input type="checkbox" id="opti">
-    <label for="opti">Eliminar subtítulos espúreos.</label>
-
-    <label for="persistence" id="persistenceLabel">Persistencia (segundos):</label>
-    <input type="number" id="persistence" disabled min = "1">
-
-    <label for="espureo" id="espureoLabel">Ventana de subtitulo espúreo (milisegundos)
-        </label>
-    <input type="number" id="espureo" step="100" disabled min="200" max="1500" value="1000">
-
-    <label for="colorA">Color idioma superior: </label>
-    <input type="color" id="colorA" value="#ffffff">
-
-    <label for="colorB">Color idioma inferior: </label>
-    <input type="color" id="colorB" value="#ffffff">
-
-    <label for="codA">Codificación del idioma A: </label>
-    <select name="codificacionA" id="codA">
-        <option value="utf-8" selected>UTF-8</option>
-        <option value="windows-1252">Windows 1252</option>
-        <option value="iso-8859-1">ISO 8859-1</option>
-    </select>
-
-    <label for="codB">Codificación del idioma B: </label>
-    <select name="codificacionB" id="codB">
-        <option value="utf-8" selected>UTF-8</option>
-        <option value="windows-1252">Windows 1252</option>
-        <option value="iso-8859-1">ISO 8859-1</option>
-    </select>
-
-
-    <a href="" hidden id="descarga">Descarga</a>
-
-
-
-    <br>
     <div id="container">
+        <div id="inputContainer">
+            <input type="file" name="inputfile" id="inputFile">
+            <input type="file" name="secFile" id="secFile">
+
+
+            <label for="opti">Eliminar subtítulos espúreos. <input type="checkbox" id="opti">
+            </label>
+
+            <label for="persistence" id="persistenceLabel">Persistencia (segundos):<input type="number" id="persistence"
+                    disabled min="1">
+            </label>
+
+
+            <label for="espureo" id="espureoLabel">Ventana de subtitulo espúreo (milisegundos):<input type="number"
+                    id="espureo" step="100" disabled min="200" max="1500" value="1000">
+            </label>
+
+
+            <label for="colorA">Color idioma superior:
+                <input type="color" id="colorA" value="#ffffff">
+            </label>
+
+
+            <label for="colorB">Color idioma inferior:
+                <input type="color" id="colorB" value="#ffffff"> </label>
+
+
+            <label for="codA">Codificación del idioma A:
+                <select name="codificacionA" id="codA">
+                    <option value="utf-8" selected>UTF-8</option>
+                    <option value="windows-1252">Windows 1252</option>
+                    <option value="iso-8859-1">ISO 8859-1</option>
+                </select>
+            </label>
+
+
+            <label for="codB">Codificación del idioma B:
+                <select name="codificacionB" id="codB">
+                    <option value="utf-8" selected>UTF-8</option>
+                    <option value="windows-1252">Windows 1252</option>
+                    <option value="iso-8859-1">ISO 8859-1</option>
+                </select>
+            </label>
+
+
+            <button type="button" id="mergeButton">Merge</button>
+            <a href="" id="descarga">Descarga</a>
+
+            
+        </div>
+        
+
         <pre id="output"></pre>
         <pre id="secOutPut"></pre>
         <pre id="thirdOutPut"></pre>
-        <pre id="forthOutPut"></pre>
+
     </div>
     <script type="module" src="script.js">
 
