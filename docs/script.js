@@ -1,7 +1,7 @@
 import Subtitle from './Subtitle.js';
 import Evento from './Evento.js';
 import {
-  read, toMiliSeconds, toTimeStamp, parseSRT, unParseMergedSRT, write, eventMerge, addColor, download, addPersistence,
+  read, toMiliSeconds, toTimeStamp, parseSRT, unParseMergedSRT, write, eventMerge, download, addPersistence,
   optSubtitles, isContinuous
 } from './srtActions.js';
 

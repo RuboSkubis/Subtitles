@@ -5,7 +5,6 @@ import MergedSubtitle from './MergedSubtitle.js';
 const regExpInicio = /\d{2}:\d{2}:\d{2},\d{3}./;
 const regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
 
-
 //Parámetro: <input type="file">
 //Funcionamiento: Devuelve una promesa cuyo resultado es el contenido del fichero srt en una variable string
 export async function read(entrada, codificacion) {
