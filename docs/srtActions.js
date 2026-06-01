@@ -267,24 +267,6 @@ export function eventMerge(subtitlesA, subtitlesB) {
 
     return subtitlesC;
 }
-//Parámetro: array de objetos subtitle al que queremos añadir color
-//FUncionamiento: añado color al array de objetos subtitulo que se le pasa por parámetro
-export function addColor(subtitles) {
-    let colorA = document.getElementById("colorA").value;
-    let colorB = document.getElementById("colorB").value;
-
-    if (colorA != "#ffffff") {
-        for (let i = 0; i < subtitles.length; i++) {
-            subtitles[i].contenidoA = "<font color ='" + colorA + "'>" + subtitles[i].contenidoA + "</font>";
-        }
-    }
-
-    if (colorB != "#ffffff") {
-        for (let i = 0; i < subtitles.length; i++) {
-            subtitles[i].contenidoA = "<font color ='" + colorA + "'>" + subtitles[i].contenidoA + "</font>";
-        }
-    }
-}
 //Parámtros: un string con contenido de un fichero SRT, y el nombre del fichero deseado
 //Funcionamiento: habilita enlace de descarga para descargar fichero SRT
 export function download(data, filename) {

@@ -106,11 +106,15 @@ document.getElementById("mergeButton")
         subtitlesC = optSubtitles(subtitlesC, optMode);
         addPersistence(subtitlesC, Number(document.getElementById("persistence").value));
       }
-      addColor(subtitlesC);
+      
+
+      subtitlesC.forEach((item) => {
+        item.addColor(document.getElementById("colorA").value,document.getElementById("colorB").value)
+      });
 
       write(thirdOutPut, subtitlesC);
       // let nombreFichero = prompt("Indica el nombre que deseas para el fichero resultado");
-      let nombreFichero = "resultado";
+      let nombreFichero = "merged";
       nombreFichero += ".srt";
       download(unParseMergedSRT(subtitlesC), nombreFichero);
     }
