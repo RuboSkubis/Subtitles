@@ -1,6 +1,6 @@
 import Subtitle from './Subtitle.js';
 import Evento from './Evento.js';
-import mergedSubtitle from './mergedSubtitle.js';
+import MergedSubtitle from './MergedSubtitle.js';
 
 const regExpInicio = /\d{2}:\d{2}:\d{2},\d{3}./;
 const regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
@@ -156,7 +156,7 @@ export function parseSRT(stringFichero) {
 }
 //Parámetros: array de objetos Subtitle
 //Funcionamiento: devuelve un único String en formato SRT según los subtitúlos de entrada para ser copiado en un fichero de texto
-export function unParseSRT(subtitles) {
+export function unParseMergedSRT(subtitles) {
     let unParsedSRT = "";
     for (let i = 0; i < subtitles.length; i++) {
 
@@ -215,7 +215,7 @@ export function eventMerge(subtitlesA, subtitlesB) {
 
         if (prevTime != event.marca) {
             if (!(activeA[0] == "-" && activeB[0] == "-")) {
-                subtitlesC.push(new mergedSubtitle(prevTime, event.marca, activeA.join(" "), activeB.join(" ")));
+                subtitlesC.push(new MergedSubtitle(prevTime, event.marca, activeA.join(" "), activeB.join(" ")));
             }
 
         }
@@ -324,7 +324,7 @@ export function addPersistence(subtitles, persistenceTime) {
 //Parámetros: array de objetos subtitle
 //Funcionamiento: devuelve un array de objetos subtitle, pero habiendo quitado aquellos subtitulos en los que solo hay un idioma y la duracion es menor a 1 segundo
 //Además, añade doble persistencia con "addDoublePersistence" la pérdida de milisegundos de subtítulos al eliminar los subtítulos "espúreos"
-export function getSpecialSubtitles(subtitles, optMode) {
+export function optSubtitles(subtitles, optMode) {
 
     let specialSubtitles = [];
 

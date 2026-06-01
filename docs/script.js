@@ -1,8 +1,8 @@
 import Subtitle from './Subtitle.js';
 import Evento from './Evento.js';
 import {
-  read, toMiliSeconds, toTimeStamp, parseSRT, unParseSRT, write, eventMerge, addColor, download, addPersistence, addDoublePersistance,
-  getSpecialSubtitles, isContinuous
+  read, toMiliSeconds, toTimeStamp, parseSRT, unParseMergedSRT, write, eventMerge, addColor, download, addPersistence,
+  optSubtitles, isContinuous
 } from './srtActions.js';
 
 
@@ -12,6 +12,8 @@ import {
 let firstOutPut = document.getElementById('output');
 let secondOutPut = document.getElementById("secOutPut");
 let thirdOutPut = document.getElementById('thirdOutPut');
+
+
 
 //subtitlesA será el idioma superior y subtitlesB el inferior
 //subtitlesC es el array objetivo donde estará la fusión
@@ -101,7 +103,7 @@ document.getElementById("mergeButton")
 
       if (document.getElementById("opti").checked) {
         let optMode = Array.from(document.getElementsByName("prioridad")).find(item => item.checked == true).value;
-        subtitlesC = getSpecialSubtitles(subtitlesC, optMode);
+        subtitlesC = optSubtitles(subtitlesC, optMode);
         addPersistence(subtitlesC, Number(document.getElementById("persistence").value));
       }
       addColor(subtitlesC);
@@ -110,7 +112,7 @@ document.getElementById("mergeButton")
       // let nombreFichero = prompt("Indica el nombre que deseas para el fichero resultado");
       let nombreFichero = "resultado";
       nombreFichero += ".srt";
-      download(unParseSRT(subtitlesC), nombreFichero);
+      download(unParseMergedSRT(subtitlesC), nombreFichero);
     }
 
     else {
