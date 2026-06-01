@@ -153,7 +153,7 @@ export function parseSRT(stringFichero) {
 
 
 }
-//Parámetros: array de objetos Subtitle
+//Parámetros: array de objetos MergedSubtitle
 //Funcionamiento: devuelve un único String en formato SRT según los subtitúlos de entrada para ser copiado en un fichero de texto
 export function unParseMergedSRT(subtitles) {
     let unParsedSRT = "";
@@ -283,7 +283,7 @@ export function download(data, filename) {
 
 
 }
-// Parámetros:array de objetos Subtitle y tiempo de persistencia en sgundos
+// Parámetros:array de objetos MergedSubtitle y tiempo de persistencia en sgundos
 //Funcionamiento:añade persistencia al array de subtitulos que se pasa por parámetro.
 export function addPersistence(subtitles, persistenceTime) {
 
@@ -302,9 +302,9 @@ export function addPersistence(subtitles, persistenceTime) {
     }
 
 }
-//Parámetros: array de objetos subtitle
-//Funcionamiento: devuelve un array de objetos subtitle, pero habiendo quitado aquellos subtitulos en los que solo hay un idioma y la duracion es menor a 1 segundo
-//Además, añade doble persistencia con "addDoublePersistence" la pérdida de milisegundos de subtítulos al eliminar los subtítulos "espúreos"
+//Parámetros: array de objetos subtitle y modo de optimización
+//Funcionamiento: devuelve un array de objetos subtitle, pero habiendo quitado los subtítulos "espúreos" utilizando una de las cuatro posibles
+//estrategias: prioridad arriba,prioridad abajo, maximizar tiempo y minimzar tiempo.
 export function optSubtitles(subtitles, optMode) {
 
     let specialSubtitles = [];
@@ -608,7 +608,7 @@ export function optSubtitles(subtitles, optMode) {
     return specialSubtitles;
 }
 //Parámetros:array de objetos subtitle
-//Funcionamiento: devuelve true o false según haya continuidad temporal en el array del parámetro(esto es para hacer pruebas)
+//Funcionamiento: devuelve true o false según haya continuidad temporal en el array de subtitulos del parámetro(esto es para hacer pruebas)
 export function isContinuous(subtitles) {
 
     let esContinuo = true;
