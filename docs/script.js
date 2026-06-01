@@ -22,7 +22,7 @@ let subtitlesC = [];
 
 //Funcionamiento: hace que se pueda meter en el primer input file un fichero (idioma A), y después lo imprime en la ventana del navegador para ver 
 //el resultado del parseo, dejando cada subtítulo como una sola línea
-document.getElementById('inputfile')
+document.getElementById('inputFile')
   .addEventListener('change', function () {
 
     if (this.files[0].name.includes(".srt")) {
@@ -74,7 +74,7 @@ document.getElementById('secFile')
               write(secondOutPut, subtitlesB);
             }
           }
-          catch(error){
+          catch (error) {
             alert("La codificación seleccionada para el idioma inferior no es adecuada. Pruebe otra")
           }
         }
@@ -100,7 +100,7 @@ document.getElementById("mergeButton")
         subtitlesC = getSpecialSubtitles(subtitlesC);
       }
 
-      if (document.getElementById("persistence").value != "") {
+      if (!document.getElementById("persistence").disabled) {
         addPersistence(subtitlesC, Number(document.getElementById("persistence").value));
       }
       addColor(subtitlesC);
@@ -131,9 +131,19 @@ document.getElementById("opti")
       document.getElementById("persistence").disabled = true;
       document.getElementById("espureo").disabled = true;
       document.getElementById("persistence").value = "";
-      document.getElementById("espureo").value = "";
+      document.getElementById("espureo").value = "1000";
 
     }
+  });
+
+document.getElementById("espureo")
+  .addEventListener("keydown", function (event) {
+    event.preventDefault();
+  });
+
+document.getElementById("persistence")
+  .addEventListener("keydown", function (event) {
+    event.preventDefault();
   });
 
 

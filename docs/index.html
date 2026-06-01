@@ -10,7 +10,7 @@
 
 <body>
 
-    <input type="file" name="inputfile" id="inputfile">
+    <input type="file" name="inputfile" id="inputFile">
     <input type="file" name="secFile" id="secFile">
 
     <button type="button" id="mergeButton">Merge</button>
@@ -18,14 +18,14 @@
 
 
     <input type="checkbox" id="opti">
-    <label for="opti">Eliminar subtítulos solitarios.</label>
+    <label for="opti">Eliminar subtítulos espúreos.</label>
 
     <label for="persistence" id="persistenceLabel">Persistencia (segundos):</label>
-    <input type="number" id="persistence" disabled>
+    <input type="number" id="persistence" disabled min = "0">
 
-    <label for="espureo" id="espureoLabel">Milisegundos de la ventana de subtitulo espúreo
-        (se recomienda un valor de entre 1000 y 1500, siendo preferible 1000)</label>
-    <input type="number" id="espureo" step="100" disabled>
+    <label for="espureo" id="espureoLabel">Ventana de subtitulo espúreo (milisegundos)
+        </label>
+    <input type="number" id="espureo" step="100" disabled min="200" max="1500" value="1000">
 
     <label for="colorA">Color idioma superior: </label>
     <input type="color" id="colorA" value="#ffffff">
