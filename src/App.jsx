@@ -4,7 +4,7 @@ import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
 
-function App() {
+export default function App() {
   const [count, setCount] = useState(0)
 
   return (
@@ -119,4 +119,126 @@ function App() {
   )
 }
 
-export default App
+export default function App(){
+  return (
+    <>
+    <SRTInput/>
+    <Codification/>
+    <OptimizationCheck/>
+    <OptimizationCheck/>
+    <PriorityRadio/>
+    <PersistenceInput/>
+    <Color/>
+    <MergeButton/>
+    <Output/>
+    </>
+  );
+}
+
+
+function SRTInput() {
+  return (
+    <>
+      <input type="file" name="inputfile" id="inputFile"></input>
+      <input type="file" name="secFile" id="secFile"></input>
+    </>
+  );
+
+}
+
+function OptimizationCheck() {
+
+  return (
+    <>
+      <label for="opti">Modo optimizado.<input type="checkbox" id="opti"></input>
+      </label>
+    </>
+  );
+}
+
+function PriorityRadio() {
+  return (
+    <>
+      <label for="prioridadSuperior"><input type="radio" id="prioridadSuperior" name="prioridad" value="prioridadSuperior" disabled checked></input>Prioridad de los subtítulos superiores</label>
+      <label for="prioridadInferior"><input type="radio" id="prioridadInferior" name="prioridad" value="prioridadInferior" disabled></input>Prioridad de los subtítulos inferiores</label>
+      <label for="prioridadMaximizar"><input type="radio" id="prioridadMaximizar" name="prioridad" value="prioridadMaximizar" disabled></input>Maximizar tiempo</label>
+      <label for="prioridadMinimizar"><input type="radio" id="prioridadMinimizar" name="prioridad" value="prioridadMinimizar" disabled></input>Minimizar tiempo</label>
+    </>
+  )
+}
+
+function PersistenceInput() {
+  return (
+    <>
+      <label for="persistence" id="persistenceLabel">Persistencia (segundos):<input type="number" id="persistence"
+        disabled min="1"></input>
+      </label>
+    </>
+  );
+
+}
+
+
+function Color() {
+
+  return (
+    <>
+      <label for="colorA">Color idioma superior:
+        <input type="color" id="colorA" value="#ffffff"></input>
+      </label>
+
+
+      <label for="colorB">Color idioma inferior:
+        <input type="color" id="colorB" value="#ffffff"></input> </label>
+    </>
+  );
+}
+
+function Codification() {
+  return (
+    <>
+      <label for="codA">Codificación del idioma A:
+        <select name="codificacionA" id="codA">
+          <option value="utf-8" selected>UTF-8</option>
+          <option value="windows-1252">Windows 1252</option>
+          <option value="iso-8859-1">ISO 8859-1</option>
+        </select>
+      </label>
+
+
+      <label for="codB">Codificación del idioma B:
+        <select name="codificacionB" id="codB">
+          <option value="utf-8" selected>UTF-8</option>
+          <option value="windows-1252">Windows 1252</option>
+          <option value="iso-8859-1">ISO 8859-1</option>
+        </select>
+      </label>
+    </>
+  );
+}
+
+function MergeButton() {
+  return (
+    <>
+      <button type="button" id="mergeButton">Merge</button>
+    </>
+  );
+}
+
+function Download() {
+  return (
+    <>
+      <a href="" id="descarga">Descarga</a>
+    </>
+  );
+}
+
+function Output() {
+  return (
+    <>
+      <pre id="output"></pre>
+      <pre id="secOutPut"></pre>
+      <pre id="thirdOutPut"></pre>
+    </>
+  );
+}

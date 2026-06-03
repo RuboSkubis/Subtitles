@@ -6,16 +6,16 @@
       margin: 10px;
     }
 
-
     #inputFile,
     #secFile {
       max-width: 200px;
     }
 
-    #inputContainer > * {
+    #inputContainer>* {
       display: block;
       margin-bottom: 20px;
     }
-    #descarga{
-      visibility:hidden;
+
+    #descarga {
+      visibility: hidden;
     }
