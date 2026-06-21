@@ -82,7 +82,9 @@ export function parseSRT(stringFichero) {
     let arrayStringFichero = stringFichero.trim().split("\n").map(item => item.trim());
     let subtitles = [];
     let inicio, final, contenido;
+    //estas dos variables son las que nos permitiran detectar ficheros srt que no tengan una estructura srt en su intertior
     let subtitulosDetectados = 0;
+    let marcasDetectadas = 0;
 
     for (let i = 0; i < arrayStringFichero.length;) {
         //Esto detecta el número de cada subtitulo
@@ -112,6 +114,7 @@ export function parseSRT(stringFichero) {
         else if (arrayStringFichero[i].match(regExpInicio)) {
             inicio = toMiliSeconds(arrayStringFichero[i].match(regExpInicio)[0].trim());
             final = toMiliSeconds(arrayStringFichero[i].match(regExpFinal)[0].trim());
+            marcasDetectadas++;
             i++;
         }
         //Esto detecta todo lo que sea contenido (incluso si el contenido es vacío: más adelante con el filter se quitan todos los subtitulos vaciós
@@ -134,8 +137,9 @@ export function parseSRT(stringFichero) {
 
     console.log("Subtitulos detectados:" + subtitulosDetectados);
     console.log("Cantidad de subtitulos reales:" + subtitles.length);
+    console.log(marcasDetectadas);
 
-    if (subtitulosDetectados == subtitles.length) {
+    if (subtitulosDetectados == marcasDetectadas && marcasDetectadas == subtitles.length) {
         console.log("Estructura SRT correcta.");
         //Esto es para quitar subtítulos que no tengan contenido (esto en principio no va a suceder NUNCA)
         subtitles = subtitles.filter(item => item.contenido != undefined);
