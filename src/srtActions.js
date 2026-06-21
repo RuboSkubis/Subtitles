@@ -271,23 +271,6 @@ export function eventMerge(subtitlesA, subtitlesB) {
 
     return subtitlesC;
 }
-//Parámtros: un string con contenido de un fichero SRT, y el nombre del fichero deseado
-//Funcionamiento: habilita enlace de descarga para descargar fichero SRT
-export function download(data, filename) {
-
-    let enlaceDeDescarga = document.getElementById("descarga");
-    enlaceDeDescarga.download = filename;
-    enlaceDeDescarga.style.visibility = "visible";
-
-    let blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
-    enlaceDeDescarga.href = URL.createObjectURL(blob);
-
-    enlaceDeDescarga.addEventListener("click", function () {
-        URL.revokeObjectURL(this.href);
-    })
-
-
-}
 // Parámetros:array de objetos MergedSubtitle y tiempo de persistencia en sgundos
 //Funcionamiento:añade persistencia al array de subtitulos que se pasa por parámetro.
 export function addPersistence(subtitles, persistenceTime) {
