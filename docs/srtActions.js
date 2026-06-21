@@ -7,7 +7,7 @@ const regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
 
 //Parámetro: <input type="file">
 //Funcionamiento: Devuelve una promesa cuyo resultado es el contenido del fichero srt en una variable string
-export async function read(entrada, codificacion) {
+export async function read(entrada) {
     let promesaDefichero = new Promise(function (resolve) {
         let fr = new FileReader();
 

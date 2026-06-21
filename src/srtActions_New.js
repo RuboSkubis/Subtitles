@@ -167,20 +167,21 @@ export function unParseMergedSRT(subtitles) {
 //Parámetros: elemento HTML donde imprimir contenido para comparaciones visuales en la ventana y array de objetos "Subtitle"
 //Funcionamiento: (se presupone outPut = etiqueta <pre>)imprime en output lo que se imprimiría en el fichero SRT basándose
 //en un array de objetos "Subtitle"
-export function write(outPut, subtitles) {
-    outPut.textContent = "";
+export function write(subtitles) {
+    let textContent = "";
 
     if (subtitles[0] instanceof Subtitle) {
         for (let i = 0; i < subtitles.length; i++) {
-            outPut.textContent += (i + 1) + "\n" + toTimeStamp(subtitles[i].inicio) + " --> " + toTimeStamp(subtitles[i].final) + "\n" + subtitles[i].contenido + "\n\n";
+            textContent += (i + 1) + "\n" + toTimeStamp(subtitles[i].inicio) + " --> " + toTimeStamp(subtitles[i].final) + "\n" + subtitles[i].contenido + "\n\n";
         }
     }
 
     else {
         for (let i = 0; i < subtitles.length; i++) {
-            outPut.textContent += (i + 1) + "\n" + toTimeStamp(subtitles[i].inicio) + " --> " + toTimeStamp(subtitles[i].final) + "\n" + subtitles[i].contenidoA + "\n" + subtitles[i].contenidoB + "\n\n";
+            textContent += (i + 1) + "\n" + toTimeStamp(subtitles[i].inicio) + " --> " + toTimeStamp(subtitles[i].final) + "\n" + subtitles[i].contenidoA + "\n" + subtitles[i].contenidoB + "\n\n";
         }
     }
+    return textContent;
 
 }
 //Parámetros: dos arrays de objetos Subtitulos para fusionar

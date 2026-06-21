@@ -6,8 +6,7 @@
       margin: 10px;
     }
 
-    #inputFile,
-    #secFile {
+    .inputFile {
       max-width: 200px;
     }
 

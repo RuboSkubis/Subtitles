@@ -1,13 +1,9 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
-
-import {
-  read, toMiliSeconds, toTimeStamp, parseSRT, unParseMergedSRT, write, eventMerge, download, addPersistence,
-  optSubtitles, isContinuous
-} from './srtActions.js';
+import { useState } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from './assets/vite.svg';
+import heroImg from './assets/hero.png';
+import { read, toMiliSeconds, toTimeStamp, parseSRT, unParseMergedSRT, write, eventMerge, download, addPersistence, optSubtitles, isContinuous } from './srtActions_New';
+import './App.css';
 
 // export default function App() {
 //   const [count, setCount] = useState(0)
@@ -123,25 +119,73 @@ import {
 //     </>
 //   )
 // }
-let subtititlesA = [];
-let subtitlesB = [];
-let subtitlesC = [];
+
+
 export default function App() {
 
   const [subtitlesA, setSubtitlesA] = useState([]);
   const [textA, setTextA] = useState("");
+  const [codA, setCodA] = useState("utf-8");
+  const [colorA, setColorA] = useState("#ffffff");
+
+  const [subtitlesB, setSubtitlesB] = useState([]);
   const [textB, setTextB] = useState("");
+  const [codB, setCodB] = useState("utf-8");
+  const [colorB, setColorB] = useState("#ffffff");
+
   const [textC, setTextC] = useState("");
+
+  const [optiMode, setOptiMode] = useState(false);
+
+
+
+  function handleCodAChange(e) {
+    setCodA(e.target.value);
+  }
+
+  function handleSubtitlesAChange(subtitles) {
+
+    setSubtitlesA(subtitles);
+    setTextA(write(subtitles));
+  }
+
+  function handleCodBChange(e) {
+    setCodB(e.target.value);
+  }
+
+  function handleSubtitlesBChange(subtitles) {
+
+    setSubtitlesB(subtitles);
+    setTextB(write(subtitles));
+  }
+
+  function handleTextCChange(text) {
+    setTextC(text);
+  }
+
+  function handleColorAChange(e) {
+    setColorA(e.target.value);
+  }
+
+  function handleColorBChange(e) {
+    setColorB(e.target.value);
+  }
+
   return (
 
     <div id="container">
       <div id="inputContainer">
-        <SRTInput name="inputfile" id="inputfile" />
+        <SRTInput idioma="A" codificacion={codA} color={colorA} handleSubtitlesChange={handleSubtitlesAChange} onCodChange={handleCodAChange} handleColorChange={handleColorAChange} />
+        <SRTInput idioma="B" codificacion={codB} color={colorB} handleSubtitlesChange={handleSubtitlesBChange} onCodChange={handleCodBChange} handleColorChange={handleColorBChange} />
+        <OptimizationMode />
+        <MergeButton subtitlesA={subtitlesA} subtitlesB={subtitlesB} colorA={colorA} colorB={colorB} handleTextChange={handleTextCChange} />
+
       </div>
-      <Output id="output" content={textA} />
-      <Output id="secOutPut" content={textB} />
-      <Output id="thirdOutPut" content={textC} />
-      <Codification id="codA" name="codificacionA"/>
+      <Output content={textA} />
+      <Output content={textB} />
+      <Output content={textC} />
+
+
     </div>
 
 
@@ -149,32 +193,32 @@ export default function App() {
 }
 
 
-function SRTInput({ name, id }) {
+function SRTInput({ idioma, codificacion, color, handleSubtitlesChange, onCodChange, handleColorChange }) {
 
-  function handleChange(event) {
-    if (event.target.files[0].name.includes(".srt")) {
+  function handleChange(e) {
+    if (e.target.files[0].name.includes(".srt")) {
 
-      let promesaDefichero = read(event.target);
+      let promesaDefichero = read(e.target);
       promesaDefichero.then(
         function (result) {
           try {
-            console.log(document.getElementById("codA"));
-            let decoder = new TextDecoder(document.getElementById("codA").value, { fatal: true });
+            let decoder = new TextDecoder(codificacion, { fatal: true });
             let uint8Array = new Uint8Array(result);
-            let str = decoder.decode(result)
-            subtitlesA = parse(SRT);
-            
-            
+            let str = decoder.decode(result);
+            let subtitles = parseSRT(str);
 
-            if (subtitlesA == null) {
-              alert("El fichero SRT no tiene internamente estructura de subtítulos SRT.")
+            if (subtitles == null) {
+              alert("El fichero SRT no tiene internamente estructura de subtítulos SRT.");
             }
             else {
-              setTextA(str);
+
+              handleSubtitlesChange(subtitles);
             }
           }
           catch (error) {
-            alert("La codificación utilizada para el idioma superior no es la correcta. Pruebe otra.");
+            let posicion = idioma == "A" ? "superior" : "inferior";
+
+            alert("La codificación utilizada para el idioma " + posicion + " no es la correcta. Pruebe otra.");
           }
 
         }
@@ -188,96 +232,122 @@ function SRTInput({ name, id }) {
 
   return (
     <>
-      <input type="file" onChange={handleChange} name={name} id={id}></input>
-    </>
-  );
 
-}
-
+      <label>Idioma {idioma == "A" ? "superior" : "inferior"}:
+        <input type="file" onChange={handleChange} className='inputFile'></input>
+      </label>
 
 
-// function OptimizationCheck() {
-
-//   return (
-//     <>
-//       <label for="opti">Modo optimizado.<input type="checkbox" id="opti"></input>
-//       </label>
-//     </>
-//   );
-// }
-
-// function PriorityRadio() {
-//   return (
-//     <>
-//       <label for="prioridadSuperior"><input type="radio" id="prioridadSuperior" name="prioridad" value="prioridadSuperior" disabled checked></input>Prioridad de los subtítulos superiores</label>
-//       <label for="prioridadInferior"><input type="radio" id="prioridadInferior" name="prioridad" value="prioridadInferior" disabled></input>Prioridad de los subtítulos inferiores</label>
-//       <label for="prioridadMaximizar"><input type="radio" id="prioridadMaximizar" name="prioridad" value="prioridadMaximizar" disabled></input>Maximizar tiempo</label>
-//       <label for="prioridadMinimizar"><input type="radio" id="prioridadMinimizar" name="prioridad" value="prioridadMinimizar" disabled></input>Minimizar tiempo</label>
-//     </>
-//   )
-// }
-
-// function PersistenceInput() {
-//   return (
-//     <>
-//       <label for="persistence" id="persistenceLabel">Persistencia (segundos):<input type="number" id="persistence"
-//         disabled min="1"></input>
-//       </label>
-//     </>
-//   );
-
-// }
-
-
-// function Color() {
-
-//   return (
-//     <>
-//       <label for="colorA">Color idioma superior:
-//         <input type="color" id="colorA" value="#ffffff"></input>
-//       </label>
-
-
-//       <label for="colorB">Color idioma inferior:
-//         <input type="color" id="colorB" value="#ffffff"></input> </label>
-//     </>
-//   );
-// }
-
-function Codification(id,name,idioma) {
-  return (
-    <>
-      <label htmlFor={id}>Codificación del idioma {idioma}:
-        <select name={name} id={id}>
+      <label>Codificación del idioma {idioma == "A" ? "superior" : "inferior"}:
+        <select name="codificacionA" defaultValue={codificacion} onChange={onCodChange}>
           <option value="utf-8">UTF-8</option>
           <option value="windows-1252">Windows 1252</option>
           <option value="iso-8859-1">ISO 8859-1</option>
         </select>
       </label>
+
+      <label>Color idioma {idioma == "A" ? "superior" : "inferior"}:
+        <input type="color" value={color} onChange={handleColorChange}></input>
+      </label>
     </>
   );
+
 }
 
-// function MergeButton() {
-//   return (
-//     <>
-//       <button type="button" id="mergeButton">Merge</button>
-//     </>
-//   );
-// }
-
-// function Download() {
-//   return (
-//     <>
-//       <a href="" id="descarga">Descarga</a>
-//     </>
-//   );
-// }
-
-function Output({ id, content }) {
+function Output({ content }) {
   return (
     <>
-      <pre id={id}>{content}</pre>
+      <pre>{content}</pre>
     </>
   );
 }
+
+function MergeButton({ subtitlesA, subtitlesB, colorA, colorB, handleTextChange }) {
+
+  const [downLoadReady, setDownLoadReady] = useState(false);
+  const [fileName, setFileName] = useState("merged.srt");
+  const [href, setHref] = useState("");
+
+  function merge() {
+    if (subtitlesA.length != 0 && subtitlesB.length != 0) {
+
+      let subtitlesC = eventMerge(subtitlesA, subtitlesB);
+
+
+
+      // if (document.getElementById("opti").checked) {
+      //   let optMode = Array.from(document.getElementsByName("prioridad")).find(item => item.checked == true).value;
+      //   subtitlesC = optSubtitles(subtitlesC, optMode);
+      //   addPersistence(subtitlesC, Number(document.getElementById("persistence").value));
+      // }
+
+
+      subtitlesC.forEach((item) => {
+        item.addColor(colorA, colorB);
+      });
+
+
+      handleTextChange(write(subtitlesC));
+      // let nombreFichero = prompt("Indica el nombre que deseas para el fichero resultado");
+
+
+
+      let blob = new Blob([unParseMergedSRT(subtitlesC)], { type: 'text/plain;charset=utf-8' });
+      setHref(URL.createObjectURL(blob));
+
+      console.log("¿Hay continuidad en el resultado?: " + isContinuous(subtitlesC));
+    }
+
+    else {
+      alert("Tienes que meter dos ficheros.");
+    }
+
+  }
+
+  function download() {
+    URL.revokeObjectURL(href);
+  }
+
+  return (
+    <>
+      <button type="button" id="mergeButton" onClick={merge}>Merge</button>
+      <a href={href} download={fileName} onClick={download} style={{ visibility: href ? "" : "hidden" }}>Descarga</a>
+    </>
+  );
+}
+
+function OptimizationMode() {
+
+  return (
+    <>
+      <label>Modo optimizado.
+        <input type="checkbox"></input>
+      </label>
+
+      <label>
+        <input type="radio" name="prioridad" value="prioridadSuperior" disabled checked></input>
+        Prioridad de los subtítulos superiores
+      </label>
+
+      <label for="prioridadInferior">
+        <input type="radio" id="prioridadInferior" name="prioridad" value="prioridadInferior" disabled></input>
+        Prioridad de los subtítulos inferiores
+      </label>
+
+      <label for="prioridadMaximizar">
+        <input type="radio" id="prioridadMaximizar" name="prioridad" value="prioridadMaximizar" disabled></input>
+        Maximizar tiempo
+      </label>
+
+      <label for="prioridadMinimizar">
+        <input type="radio" id="prioridadMinimizar" name="prioridad" value="prioridadMinimizar" disabled></input>
+        Minimizar tiempo
+      </label>
+
+      <label for="persistence" id="persistenceLabel">Persistencia (segundos):
+        <input type="number" id="persistence" disabled min="1"></input>
+      </label>
+    </>
+  );
+}
+
