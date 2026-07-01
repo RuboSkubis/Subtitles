@@ -4,17 +4,16 @@ import viteLogo from './assets/vite.svg';
 import heroImg from './assets/hero.png';
 import { read, toMiliSeconds, toTimeStamp, parseSRT, unParseMergedSRT, write, eventMerge, addPersistence, optSubtitles, isContinuous } from './srtActions';
 import './App.css';
+import { detect } from './jschardet.esm.min.js';
 
 export default function App() {
 
   const [subtitlesA, setSubtitlesA] = useState([]);
   const [textA, setTextA] = useState("");
-  const [codA, setCodA] = useState("utf-8");
   const [colorA, setColorA] = useState("#ffffff");
 
   const [subtitlesB, setSubtitlesB] = useState([]);
   const [textB, setTextB] = useState("");
-  const [codB, setCodB] = useState("utf-8");
   const [colorB, setColorB] = useState("#ffffff");
 
   const [textC, setTextC] = useState("");
@@ -25,9 +24,6 @@ export default function App() {
 
 
 
-  function handleCodAChange(e) {
-    setCodA(e.target.value);
-  }
 
   function handleSubtitlesAChange(subtitles) {
 
@@ -35,9 +31,6 @@ export default function App() {
     setTextA(write(subtitles));
   }
 
-  function handleCodBChange(e) {
-    setCodB(e.target.value);
-  }
 
   function handleSubtitlesBChange(subtitles) {
 
@@ -74,8 +67,8 @@ export default function App() {
 
     <div id="container">
       <div id="inputContainer">
-        <SRTInput idioma="A" codificacion={codA} color={colorA} handleSubtitlesChange={handleSubtitlesAChange} onCodChange={handleCodAChange} handleColorChange={handleColorAChange} />
-        <SRTInput idioma="B" codificacion={codB} color={colorB} handleSubtitlesChange={handleSubtitlesBChange} onCodChange={handleCodBChange} handleColorChange={handleColorBChange} />
+        <SRTInput idioma="A" color={colorA} handleSubtitlesChange={handleSubtitlesAChange} handleColorChange={handleColorAChange} />
+        <SRTInput idioma="B" color={colorB} handleSubtitlesChange={handleSubtitlesBChange} handleColorChange={handleColorBChange} />
         <OptimizationSettings isOff={optModeOff} mode={mode} persistenceTime={persistenceTime} handleModeChange={handleModeChange} handleOptActivation={handleOptActivation} handlePersistenceTimeChange={handlePersistenceTimeChange} />
         <MergeButton subtitlesA={subtitlesA} subtitlesB={subtitlesB} colorA={colorA} colorB={colorB} optModeOff={optModeOff} mode={mode} persistenceTime={persistenceTime} handleTextChange={handleTextCChange} />
 
@@ -92,7 +85,7 @@ export default function App() {
 }
 
 
-function SRTInput({ idioma, codificacion, color, handleSubtitlesChange, onCodChange, handleColorChange }) {
+function SRTInput({ idioma, color, handleSubtitlesChange, handleColorChange }) {
 
   function handleChange(e) {
     if (e.target.files[0].name.includes(".srt")) {
@@ -101,8 +94,26 @@ function SRTInput({ idioma, codificacion, color, handleSubtitlesChange, onCodCha
       promesaDefichero.then(
         function (result) {
           try {
-            let decoder = new TextDecoder(codificacion, { fatal: true });
+
             let uint8Array = new Uint8Array(result);
+            let string = "";
+            for (var i = 0; i < uint8Array.length; ++i) {
+              string += String.fromCharCode(uint8Array[i]);
+            }
+            console.log(detect(string));
+            var detectedEncoding = detect(string).encoding;
+            console.log(detectedEncoding);
+
+
+            var decoder = new TextDecoder(detectedEncoding, { fatal: true });
+          }
+          catch (error) {
+            console.log(error);
+            alert("La codificación del fichero seleccionado " + detectedEncoding + " no es soportada.Es posible que algunos caracteres no se representen correctamente.");
+            decoder = new TextDecoder();
+          }
+
+          finally {
             let str = decoder.decode(result);
             let subtitles = parseSRT(str);
 
@@ -113,11 +124,6 @@ function SRTInput({ idioma, codificacion, color, handleSubtitlesChange, onCodCha
 
               handleSubtitlesChange(subtitles);
             }
-          }
-          catch (error) {
-            let posicion = idioma == "A" ? "superior" : "inferior";
-
-            alert("La codificación utilizada para el idioma " + posicion + " no es la correcta. Pruebe otra.");
           }
 
         }
@@ -134,15 +140,6 @@ function SRTInput({ idioma, codificacion, color, handleSubtitlesChange, onCodCha
 
       <label>Idioma {idioma == "A" ? "superior" : "inferior"}:
         <input type="file" onChange={handleChange} className='inputFile'></input>
-      </label>
-
-
-      <label>Codificación del idioma {idioma == "A" ? "superior" : "inferior"}:
-        <select name="codificacionA" defaultValue={codificacion} onChange={onCodChange}>
-          <option value="utf-8">UTF-8</option>
-          <option value="windows-1252">Windows 1252</option>
-          <option value="iso-8859-1">ISO 8859-1</option>
-        </select>
       </label>
 
       <label>Color idioma {idioma == "A" ? "superior" : "inferior"}:
@@ -163,7 +160,7 @@ function Output({ content }) {
 
 function MergeButton({ subtitlesA, subtitlesB, colorA, colorB, optModeOff, mode, persistenceTime, handleTextChange }) {
 
-  
+
   const [fileName, setFileName] = useState("merged.srt");
   const [href, setHref] = useState("");
 
@@ -183,7 +180,7 @@ function MergeButton({ subtitlesA, subtitlesB, colorA, colorB, optModeOff, mode,
       });
 
       handleTextChange(write(subtitlesC));
-      
+
       let blob = new Blob([unParseMergedSRT(subtitlesC)], { type: 'text/plain;charset=utf-8' });
       setHref(URL.createObjectURL(blob));
 
