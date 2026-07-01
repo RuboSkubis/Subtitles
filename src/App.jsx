@@ -100,9 +100,9 @@ function SRTInput({ idioma, color, handleSubtitlesChange, handleColorChange }) {
             for (var i = 0; i < uint8Array.length; ++i) {
               string += String.fromCharCode(uint8Array[i]);
             }
-            console.log(detect(string));
+            
             var detectedEncoding = detect(string).encoding;
-            console.log(detectedEncoding);
+            
 
 
             var decoder = new TextDecoder(detectedEncoding, { fatal: true });
@@ -170,7 +170,7 @@ function MergeButton({ subtitlesA, subtitlesB, colorA, colorB, optModeOff, mode,
       let subtitlesC = eventMerge(subtitlesA, subtitlesB);
 
       if (!optModeOff) {
-        console.log("Pase por aqui");
+        
         subtitlesC = optSubtitles(subtitlesC, mode);
         addPersistence(subtitlesC, persistenceTime);
       }
