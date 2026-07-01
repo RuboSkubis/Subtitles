@@ -6,6 +6,7 @@ import {
   optSubtitles, isContinuous
 } from './srtActions.js';
 
+// import { detect, detectAll } from './';
 
 
 //Elementos html <pre> donde se imprimira el resultado de leer, respectivamente, el fichero A, el fichero B, y el fichero C
@@ -34,10 +35,11 @@ document.getElementById('inputFile')
       promesaDefichero.then(
         function (result) {
           try {
-            let decoder = new TextDecoder(document.getElementById("codA").value, { fatal: true });
-            let uint8Array = new Uint8Array(result);
-            let str = decoder.decode(result)
-            subtitlesA = parseSRT(str);
+            // let decoder = new TextDecoder(document.getElementById("codA").value, { fatal: true });
+            // let uint8Array = new Uint8Array(result);
+            // let str = decoder.decode(result)
+            console.log(result);
+            subtitlesA = parseSRT(result);
             
             if (subtitlesA == null) {
               alert("El fichero SRT no tiene internamente estructura de subtítulos SRT.")
