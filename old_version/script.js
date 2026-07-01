@@ -43,10 +43,23 @@ document.getElementById('inputFile')
               string += String.fromCharCode(uint8Array[i]);
             }
 
-            let detectedEncoding = detect(string).encoding;
+            console.log(detect(string));
+            var detectedEncoding = detect(string).encoding;
+            console.log(detectedEncoding);
 
 
-            let decoder = new TextDecoder(detectedEncoding, { fatal: true });
+            var decoder = new TextDecoder(detectedEncoding, { fatal: true });
+          }
+          catch (error) {
+            console.log(error);
+            alert("La codificación del fichero seleccionado " + detectedEncoding + " no es soportada.Es posible que algunos caracteres no se representen correctamente.");
+            decoder = new TextDecoder();
+          }
+
+          finally {
+
+            
+
             let str = decoder.decode(result);
 
 
@@ -58,10 +71,6 @@ document.getElementById('inputFile')
             else {
               write(firstOutPut, subtitlesA);
             }
-          }
-          catch (error) {
-
-            alert("La codificación " + detectedEncoding + " no es soportada.");
           }
 
         }
@@ -89,10 +98,23 @@ document.getElementById('secFile')
               string += String.fromCharCode(uint8Array[i]);
             }
 
-            let detectedEncoding = detect(string).encoding;
+            console.log(detect(string));
+            var detectedEncoding = detect(string).encoding;
+            console.log(detectedEncoding);
 
 
-            let decoder = new TextDecoder(detectedEncoding, { fatal: true });
+            var decoder = new TextDecoder(detectedEncoding, { fatal: true });
+          }
+          catch (error) {
+            console.log(error);
+            alert("La codificación del fichero seleccionado " + detectedEncoding + " no es soportada.Es posible que algunos caracteres no se representen correctamente.");
+            decoder = new TextDecoder();
+          }
+
+          finally {
+
+            
+
             let str = decoder.decode(result);
 
 
@@ -102,12 +124,8 @@ document.getElementById('secFile')
               alert("El fichero SRT no tiene internamente estructura de subtítulos SRT.")
             }
             else {
-              write(secondOutPut, subtitlesA);
+              write(secondOutPut, subtitlesB);
             }
-          }
-          catch (error) {
-
-            alert("La codificación " + detectedEncoding + " no es soportada.");
           }
 
         }
