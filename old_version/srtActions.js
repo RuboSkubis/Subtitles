@@ -16,7 +16,7 @@ export async function read(entrada) {
             resolve(fr.result);
         }
 
-        fr.readAsText(entrada.files[0]);
+        fr.readAsArrayBuffer(entrada.files[0]);
     });
 
     return await promesaDefichero;

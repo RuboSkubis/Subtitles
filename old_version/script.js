@@ -6,7 +6,7 @@ import {
   optSubtitles, isContinuous
 } from './srtActions.js';
 
-// import { detect, detectAll } from './';
+import { detect, detectAll } from './jschardet.esm.min.js';
 
 
 //Elementos html <pre> donde se imprimira el resultado de leer, respectivamente, el fichero A, el fichero B, y el fichero C
@@ -35,12 +35,23 @@ document.getElementById('inputFile')
       promesaDefichero.then(
         function (result) {
           try {
-            // let decoder = new TextDecoder(document.getElementById("codA").value, { fatal: true });
-            // let uint8Array = new Uint8Array(result);
-            // let str = decoder.decode(result)
-            console.log(result);
-            subtitlesA = parseSRT(result);
-            
+
+            let uint8Array = new Uint8Array(result);
+
+            let string = "";
+            for (var i = 0; i < uint8Array.length; ++i) {
+              string += String.fromCharCode(uint8Array[i]);
+            }
+
+            let detectedEncoding = detect(string).encoding;
+
+
+            let decoder = new TextDecoder(detectedEncoding, { fatal: true });
+            let str = decoder.decode(result);
+
+
+            subtitlesA = parseSRT(str);
+
             if (subtitlesA == null) {
               alert("El fichero SRT no tiene internamente estructura de subtítulos SRT.")
             }
@@ -49,7 +60,8 @@ document.getElementById('inputFile')
             }
           }
           catch (error) {
-            alert("La codificación utilizada para el idioma superior no es la correcta. Pruebe otra.");
+
+            alert("La codificación " + detectedEncoding + " no es soportada.");
           }
 
         }
@@ -69,26 +81,42 @@ document.getElementById('secFile')
       promesaDefichero.then(
         function (result) {
           try {
-            let decoder = new TextDecoder(document.getElementById("codB").value, { fatal: true });
+
             let uint8Array = new Uint8Array(result);
-            let str = decoder.decode(result)
+
+            let string = "";
+            for (var i = 0; i < uint8Array.length; ++i) {
+              string += String.fromCharCode(uint8Array[i]);
+            }
+
+            let detectedEncoding = detect(string).encoding;
+
+
+            let decoder = new TextDecoder(detectedEncoding, { fatal: true });
+            let str = decoder.decode(result);
+
+
             subtitlesB = parseSRT(str);
+
             if (subtitlesB == null) {
               alert("El fichero SRT no tiene internamente estructura de subtítulos SRT.")
             }
             else {
-              write(secondOutPut, subtitlesB);
+              write(secondOutPut, subtitlesA);
             }
           }
           catch (error) {
-            alert("La codificación seleccionada para el idioma inferior no es adecuada. Pruebe otra")
+
+            alert("La codificación " + detectedEncoding + " no es soportada.");
           }
+
         }
       );
     }
     else {
       alert("Tienes que introducir un archivo con extensión .srt");
     }
+
   });
 //Funcionamiento: tras introducir dos ficheros en los dos input files (porque de lo contrario no permite hacer nada) fusiona los dos ficheros 
 //srt de entrada, generando un array de objetos subtítulo resultado de la fusión; después comprueba si está marcada la opción de "Eliminar subtitulos
@@ -109,10 +137,10 @@ document.getElementById("mergeButton")
         subtitlesC = optSubtitles(subtitlesC, optMode);
         addPersistence(subtitlesC, Number(document.getElementById("persistence").value));
       }
-      
+
 
       subtitlesC.forEach((item) => {
-        item.addColor(document.getElementById("colorA").value,document.getElementById("colorB").value)
+        item.addColor(document.getElementById("colorA").value, document.getElementById("colorB").value)
       });
 
       write(thirdOutPut, subtitlesC);
