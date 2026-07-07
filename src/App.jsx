@@ -193,14 +193,10 @@ function MergeButton({ subtitlesA, subtitlesB, colorA, colorB, optModeOff, mode,
 
   }
 
-  function download() {
-    URL.revokeObjectURL(href);
-  }
-
   return (
     <>
       <button type="button" id="mergeButton" onClick={merge}>Merge</button>
-      <a href={href} download={fileName} onClick={download} style={{ visibility: href ? "" : "hidden" }}>Descarga</a>
+      <a href={href} download={fileName} style={{ visibility: href ? "" : "hidden" }}>Descarga</a>
     </>
   );
 }
