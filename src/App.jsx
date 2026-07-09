@@ -37,10 +37,6 @@ export default function App() {
     setTextB(write(subtitles));
   }
 
-  function handleTextCChange(text) {
-    setTextC(text);
-  }
-
   function handleColorAChange(e) {
     if (e == "") {
       setColorA("");
@@ -66,6 +62,12 @@ export default function App() {
     }
 
   }
+
+  function handleTextCChange(text) {
+    setTextC(text);
+  }
+
+
 
   function handleOptActivation() {
     setoptModeOn(!optModeOn);
