@@ -5,13 +5,13 @@ export default function MergedSubtitle(inicio, final, contenidoA, contenidoB) {
     this.contenidoB = contenidoB;
 
     this.addColor = function (colorA, colorB) {
-        if (colorA != "#ffffff") {
+        if (colorA != "") {
             
                 this.contenidoA = "<font color ='" + colorA + "'>" + this.contenidoA + "</font>";
             
         }
 
-        if (colorB != "#ffffff") {
+        if (colorB != "") {
             
                 this.contenidoB = "<font color ='" + colorB + "'>" + this.contenidoB + "</font>";
             

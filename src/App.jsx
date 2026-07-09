@@ -10,11 +10,11 @@ export default function App() {
 
   const [subtitlesA, setSubtitlesA] = useState([]);
   const [textA, setTextA] = useState("");
-  const [colorA, setColorA] = useState("#ffffff");
+  const [colorA, setColorA] = useState("");
 
   const [subtitlesB, setSubtitlesB] = useState([]);
   const [textB, setTextB] = useState("");
-  const [colorB, setColorB] = useState("#ffffff");
+  const [colorB, setColorB] = useState("");
 
   const [textC, setTextC] = useState("");
 
@@ -22,7 +22,8 @@ export default function App() {
   const [mode, setMode] = useState("prioridadSuperior");
   const [persistenceTime, setPersistenceTime] = useState(0);
 
-
+  const [colorAOn, setColorAOn] = useState(true);
+  const [colorBOn, setColorBOn] = useState(true);
 
 
   function handleSubtitlesAChange(subtitles) {
@@ -63,12 +64,26 @@ export default function App() {
     setPersistenceTime(Number(e.target.value));
   }
 
+  function handleColorAActivation() {
+    if (colorAOn == false) {
+      setColorA("");
+    }
+    setColorAOn(!colorAOn);
+  }
+
+  function handleColorBActivation() {
+    if (colorBOn == false) {
+      setColorB("");
+    }
+    setColorBOn(!colorBOn);
+  }
+
   return (
 
     <div id="container">
       <div id="inputContainer">
-        <SRTInput idioma="A" color={colorA} handleSubtitlesChange={handleSubtitlesAChange} handleColorChange={handleColorAChange} />
-        <SRTInput idioma="B" color={colorB} handleSubtitlesChange={handleSubtitlesBChange} handleColorChange={handleColorBChange} />
+        <SRTInput idioma="A" color={colorA} colorOn={colorAOn} handleSubtitlesChange={handleSubtitlesAChange} handleColorChange={handleColorAChange} handleColorActivation={handleColorAActivation} />
+        <SRTInput idioma="B" color={colorB} colorOn={colorBOn} handleSubtitlesChange={handleSubtitlesBChange} handleColorChange={handleColorBChange} handleColorActivation={handleColorBActivation} />
         <OptimizationSettings isOff={optModeOff} mode={mode} persistenceTime={persistenceTime} handleModeChange={handleModeChange} handleOptActivation={handleOptActivation} handlePersistenceTimeChange={handlePersistenceTimeChange} />
         <MergeButton subtitlesA={subtitlesA} subtitlesB={subtitlesB} colorA={colorA} colorB={colorB} optModeOff={optModeOff} mode={mode} persistenceTime={persistenceTime} handleTextChange={handleTextCChange} />
 
@@ -85,7 +100,9 @@ export default function App() {
 }
 
 
-function SRTInput({ idioma, color, handleSubtitlesChange, handleColorChange }) {
+function SRTInput({ idioma, color, colorOn, handleSubtitlesChange, handleColorChange, handleColorActivation }) {
+
+
 
   function handleChange(e) {
     if (e.target.files[0].name.includes(".srt")) {
@@ -100,9 +117,9 @@ function SRTInput({ idioma, color, handleSubtitlesChange, handleColorChange }) {
             for (var i = 0; i < uint8Array.length; ++i) {
               string += String.fromCharCode(uint8Array[i]);
             }
-            
+
             var detectedEncoding = detect(string).encoding;
-            
+
 
 
             var decoder = new TextDecoder(detectedEncoding, { fatal: true });
@@ -135,15 +152,18 @@ function SRTInput({ idioma, color, handleSubtitlesChange, handleColorChange }) {
   }
 
 
+
   return (
     <>
 
       <label>Idioma {idioma == "A" ? "superior" : "inferior"}:
         <input type="file" onChange={handleChange} className='inputFile'></input>
       </label>
-
+      <label>Habilitar selección de color
+        <input type="checkbox" value="" onChange={handleColorActivation}></input>
+      </label>
       <label>Color idioma {idioma == "A" ? "superior" : "inferior"}:
-        <input type="color" value={color} onChange={handleColorChange}></input>
+        <input type="color" value={color} disabled={colorOn} onChange={handleColorChange}></input>
       </label>
     </>
   );
@@ -170,7 +190,7 @@ function MergeButton({ subtitlesA, subtitlesB, colorA, colorB, optModeOff, mode,
       let subtitlesC = eventMerge(subtitlesA, subtitlesB);
 
       if (!optModeOff) {
-        
+
         subtitlesC = optSubtitles(subtitlesC, mode);
         addPersistence(subtitlesC, persistenceTime);
       }

@@ -276,16 +276,23 @@ export function eventMerge(subtitlesA, subtitlesB) {
 export function addPersistence(subtitles, persistenceTime) {
 
     if (persistenceTime != 0) {
-        for (let i = 0; i < subtitles.length - 1; i++) {
+        for (let i = 0; i < subtitles.length; i++) {
 
-            if (subtitles[i + 1].inicio - subtitles[i].final > (persistenceTime * 1000)) {
-
+            if (i == subtitles.length - 1) {
                 subtitles[i].final += (persistenceTime * 1000);
             }
-            else if (subtitles[i].final != subtitles[i + 1].inicio) {
-                subtitles[i].final += (subtitles[i + 1].inicio - subtitles[i].final - 20);
 
+            else {
+                if (subtitles[i + 1].inicio - subtitles[i].final > (persistenceTime * 1000)) {
+                    subtitles[i].final += (persistenceTime * 1000);
+                }
+
+                else if (subtitles[i].final != subtitles[i + 1].inicio) {
+                    subtitles[i].final += (subtitles[i + 1].inicio - subtitles[i].final - 20);
+                }
             }
+
+
         }
     }
 
