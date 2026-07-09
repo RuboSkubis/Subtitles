@@ -45,6 +45,9 @@ export default function App() {
     if (e == "") {
       setColorA("");
     }
+    else if (e == "#000000") {
+      setColorA("#000000");
+    }
     else {
       setColorA(e.target.value);
     }
@@ -54,6 +57,9 @@ export default function App() {
 
     if (e == "") {
       setColorB("");
+    }
+    else if (e == "#000000") {
+      setColorB("#000000");
     }
     else {
       setColorB(e.target.value);
@@ -80,8 +86,8 @@ export default function App() {
 
     <div id="container">
       <div id="inputContainer">
-        <SRTInput idioma="A" color={colorA}  handleSubtitlesChange={handleSubtitlesAChange} handleColorChange={handleColorAChange} />
-        <SRTInput idioma="B" color={colorB}  handleSubtitlesChange={handleSubtitlesBChange} handleColorChange={handleColorBChange} />
+        <SRTInput idioma="A" color={colorA} handleSubtitlesChange={handleSubtitlesAChange} handleColorChange={handleColorAChange} />
+        <SRTInput idioma="B" color={colorB} handleSubtitlesChange={handleSubtitlesBChange} handleColorChange={handleColorBChange} />
         <OptimizationSettings isOn={optModeOn} mode={mode} persistenceTime={persistenceTime} handleModeChange={handleModeChange} handleOptActivation={handleOptActivation} handlePersistenceTimeChange={handlePersistenceTimeChange} />
         <MergeButton subtitlesA={subtitlesA} subtitlesB={subtitlesB} colorA={colorA} colorB={colorB} optModeOn={optModeOn} mode={mode} persistenceTime={persistenceTime} handleTextChange={handleTextCChange} />
 
@@ -104,12 +110,15 @@ function SRTInput({ idioma, color, handleSubtitlesChange, handleColorChange }) {
 
   function handleColorActivation() {
 
-    if(colorOn==true){
+    if (colorOn == true) {
       handleColorChange("");
+    }
+    else {
+      handleColorChange("#000000");
     }
 
     setColorOn(!colorOn);
-    
+
   }
 
   function handleFileChange(e) {
