@@ -18,12 +18,10 @@ export default function App() {
 
   const [textC, setTextC] = useState("");
 
-  const [optModeOff, setoptModeOff] = useState(true);
+  const [optModeOn, setoptModeOn] = useState(false);
   const [mode, setMode] = useState("prioridadSuperior");
   const [persistenceTime, setPersistenceTime] = useState(0);
 
-  const [colorAOn, setColorAOn] = useState(true);
-  const [colorBOn, setColorBOn] = useState(true);
 
 
   function handleSubtitlesAChange(subtitles) {
@@ -44,15 +42,27 @@ export default function App() {
   }
 
   function handleColorAChange(e) {
-    setColorA(e.target.value);
+    if (e == "") {
+      setColorA("");
+    }
+    else {
+      setColorA(e.target.value);
+    }
   }
 
   function handleColorBChange(e) {
-    setColorB(e.target.value);
+
+    if (e == "") {
+      setColorB("");
+    }
+    else {
+      setColorB(e.target.value);
+    }
+
   }
 
   function handleOptActivation() {
-    setoptModeOff(!optModeOff);
+    setoptModeOn(!optModeOn);
   }
 
   function handleModeChange(e) {
@@ -64,28 +74,16 @@ export default function App() {
     setPersistenceTime(Number(e.target.value));
   }
 
-  function handleColorAActivation() {
-    if (colorAOn == false) {
-      setColorA("");
-    }
-    setColorAOn(!colorAOn);
-  }
 
-  function handleColorBActivation() {
-    if (colorBOn == false) {
-      setColorB("");
-    }
-    setColorBOn(!colorBOn);
-  }
 
   return (
 
     <div id="container">
       <div id="inputContainer">
-        <SRTInput idioma="A" color={colorA} colorOn={colorAOn} handleSubtitlesChange={handleSubtitlesAChange} handleColorChange={handleColorAChange} handleColorActivation={handleColorAActivation} />
-        <SRTInput idioma="B" color={colorB} colorOn={colorBOn} handleSubtitlesChange={handleSubtitlesBChange} handleColorChange={handleColorBChange} handleColorActivation={handleColorBActivation} />
-        <OptimizationSettings isOff={optModeOff} mode={mode} persistenceTime={persistenceTime} handleModeChange={handleModeChange} handleOptActivation={handleOptActivation} handlePersistenceTimeChange={handlePersistenceTimeChange} />
-        <MergeButton subtitlesA={subtitlesA} subtitlesB={subtitlesB} colorA={colorA} colorB={colorB} optModeOff={optModeOff} mode={mode} persistenceTime={persistenceTime} handleTextChange={handleTextCChange} />
+        <SRTInput idioma="A" color={colorA}  handleSubtitlesChange={handleSubtitlesAChange} handleColorChange={handleColorAChange} />
+        <SRTInput idioma="B" color={colorB}  handleSubtitlesChange={handleSubtitlesBChange} handleColorChange={handleColorBChange} />
+        <OptimizationSettings isOn={optModeOn} mode={mode} persistenceTime={persistenceTime} handleModeChange={handleModeChange} handleOptActivation={handleOptActivation} handlePersistenceTimeChange={handlePersistenceTimeChange} />
+        <MergeButton subtitlesA={subtitlesA} subtitlesB={subtitlesB} colorA={colorA} colorB={colorB} optModeOn={optModeOn} mode={mode} persistenceTime={persistenceTime} handleTextChange={handleTextCChange} />
 
       </div>
       <Output content={textA} />
@@ -100,9 +98,21 @@ export default function App() {
 }
 
 
-function SRTInput({ idioma, color, colorOn, handleSubtitlesChange, handleColorChange, handleColorActivation }) {
+function SRTInput({ idioma, color, handleSubtitlesChange, handleColorChange }) {
 
-  function handleChange(e) {
+  const [colorOn, setColorOn] = useState(false);
+
+  function handleColorActivation() {
+
+    if(colorOn==true){
+      handleColorChange("");
+    }
+
+    setColorOn(!colorOn);
+    
+  }
+
+  function handleFileChange(e) {
     if (e.target.files[0].name.includes(".srt")) {
 
       let promesaDefichero = read(e.target);
@@ -153,13 +163,13 @@ function SRTInput({ idioma, color, colorOn, handleSubtitlesChange, handleColorCh
     <>
 
       <label>Idioma {idioma == "A" ? "superior" : "inferior"}:
-        <input type="file" onChange={handleChange} className='inputFile'></input>
+        <input type="file" onChange={handleFileChange} className='inputFile'></input>
       </label>
       <label>Habilitar selección de color
         <input type="checkbox" value="" onChange={handleColorActivation}></input>
       </label>
-      <label style={{ display: colorOn ? "none" : "block" }}>Color idioma {idioma == "A" ? "superior" : "inferior"}:
-        <input type="color" value={color} disabled={colorOn} onChange={handleColorChange}></input>
+      <label style={{ display: colorOn ? "block" : "none" }}>Color idioma {idioma == "A" ? "superior" : "inferior"}:
+        <input type="color" value={color} disabled={!colorOn} onChange={handleColorChange}></input>
       </label>
     </>
   );
@@ -174,7 +184,7 @@ function Output({ content }) {
   );
 }
 
-function MergeButton({ subtitlesA, subtitlesB, colorA, colorB, optModeOff, mode, persistenceTime, handleTextChange }) {
+function MergeButton({ subtitlesA, subtitlesB, colorA, colorB, optModeOn, mode, persistenceTime, handleTextChange }) {
 
 
   const [fileName, setFileName] = useState("merged.srt");
@@ -185,7 +195,7 @@ function MergeButton({ subtitlesA, subtitlesB, colorA, colorB, optModeOff, mode,
 
       let subtitlesC = eventMerge(subtitlesA, subtitlesB);
 
-      if (!optModeOff) {
+      if (optModeOn) {
 
         subtitlesC = optSubtitles(subtitlesC, mode);
         addPersistence(subtitlesC, persistenceTime);
@@ -217,7 +227,7 @@ function MergeButton({ subtitlesA, subtitlesB, colorA, colorB, optModeOff, mode,
   );
 }
 
-function OptimizationSettings({ isOff, mode, persistenceTime, handleModeChange, handleOptActivation, handlePersistenceTimeChange }) {
+function OptimizationSettings({ isOn, mode, persistenceTime, handleModeChange, handleOptActivation, handlePersistenceTimeChange }) {
 
 
   return (
@@ -227,27 +237,27 @@ function OptimizationSettings({ isOff, mode, persistenceTime, handleModeChange, 
       </label>
 
       <label>
-        <input type="radio" name="prioridad" value="prioridadSuperior" disabled={isOff} checked={mode === 'prioridadSuperior'} onChange={handleModeChange}></input>
+        <input type="radio" name="prioridad" value="prioridadSuperior" disabled={!isOn} checked={mode === 'prioridadSuperior'} onChange={handleModeChange}></input>
         Prioridad a los subtítulos superiores
       </label>
 
       <label>
-        <input type="radio" name="prioridad" value="prioridadInferior" disabled={isOff} checked={mode === 'prioridadInferior'} onChange={handleModeChange}></input>
+        <input type="radio" name="prioridad" value="prioridadInferior" disabled={!isOn} checked={mode === 'prioridadInferior'} onChange={handleModeChange}></input>
         Prioridad a los subtítulos inferiores
       </label>
 
       <label>
-        <input type="radio" name="prioridad" value="prioridadMaximizar" disabled={isOff} checked={mode === 'prioridadMaximizar'} onChange={handleModeChange}></input>
+        <input type="radio" name="prioridad" value="prioridadMaximizar" disabled={!isOn} checked={mode === 'prioridadMaximizar'} onChange={handleModeChange}></input>
         Maximizar tiempo
       </label>
 
       <label>
-        <input type="radio" name="prioridad" value="prioridadMinimizar" disabled={isOff} checked={mode === 'prioridadMinimizar'} onChange={handleModeChange}></input>
+        <input type="radio" name="prioridad" value="prioridadMinimizar" disabled={!isOn} checked={mode === 'prioridadMinimizar'} onChange={handleModeChange}></input>
         Minimizar tiempo
       </label>
 
       <label id="persistenceLabel">Persistencia (segundos):
-        <input type="number" disabled={isOff} min="0" onChange={handlePersistenceTimeChange} onKeyDown={(e) => e.preventDefault()}></input>
+        <input type="number" disabled={!isOn} min="0" onChange={handlePersistenceTimeChange} onKeyDown={(e) => e.preventDefault()}></input>
       </label>
     </>
   );
