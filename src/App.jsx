@@ -162,7 +162,7 @@ function SRTInput({ idioma, color, colorOn, handleSubtitlesChange, handleColorCh
       <label>Habilitar selección de color
         <input type="checkbox" value="" onChange={handleColorActivation}></input>
       </label>
-      <label>Color idioma {idioma == "A" ? "superior" : "inferior"}:
+      <label style={{ display: colorOn ? "none" : "block" }}>Color idioma {idioma == "A" ? "superior" : "inferior"}:
         <input type="color" value={color} disabled={colorOn} onChange={handleColorChange}></input>
       </label>
     </>
