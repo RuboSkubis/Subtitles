@@ -102,8 +102,6 @@ export default function App() {
 
 function SRTInput({ idioma, color, colorOn, handleSubtitlesChange, handleColorChange, handleColorActivation }) {
 
-
-
   function handleChange(e) {
     if (e.target.files[0].name.includes(".srt")) {
 
@@ -150,8 +148,6 @@ function SRTInput({ idioma, color, colorOn, handleSubtitlesChange, handleColorCh
       alert("Tienes que introducir un archivo con extensión .srt");
     }
   }
-
-
 
   return (
     <>
