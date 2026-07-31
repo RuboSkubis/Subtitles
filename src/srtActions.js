@@ -6,16 +6,14 @@ const regExpInicio = /\d{2}:\d{2}:\d{2},\d{3}./;
 const regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
 
 //Parámetro: <input type="file">
-//Funcionamiento: Devuelve una promesa cuyo resultado es el contenido del fichero srt en una variable string
+//Funcionamiento: Devuelve una promesa cuyo resultado es el contenido del fichero srt en un arrayBuffer
 export async function read(entrada) {
     let promesaDefichero = new Promise(function (resolve) {
         let fr = new FileReader();
 
         fr.onload = function () {
-
             resolve(fr.result);
         }
-
         fr.readAsArrayBuffer(entrada.files[0]);
     });
 
@@ -75,8 +73,8 @@ export function toTimeStamp(ms) {
     }
     return timeStamp;
 }
-//Parámetros: contenido del fichero en variable string y array vacío donde se meterán "objetos subtitulo SRT" (objeto Subtitle)
-//Funcionamiento: Devuelve un array de objetos "Subtitle" basándose en los subtítulos presentes en el fichero SRT
+//Parámetros: contenido del fichero en variable string 
+//Funcionamiento: Devuelve un array de objetos "Subtitle" basándose en los subtítulos presentes en stringFichero
 export function parseSRT(stringFichero) {
 
     let arrayStringFichero = stringFichero.trim().split("\n").map(item => item.trim());
@@ -93,7 +91,6 @@ export function parseSRT(stringFichero) {
                 Number(arrayStringFichero[i]) != NaN &&
                 Number(arrayStringFichero[i]) > 0) &&
             arrayStringFichero[i + 1].match(regExpInicio)) {
-
 
             subtitulosDetectados++;
             i++;
@@ -144,34 +141,17 @@ export function parseSRT(stringFichero) {
         //Esto es para quitar subtítulos que no tengan contenido (esto en principio no va a suceder NUNCA)
         subtitles = subtitles.filter(item => item.contenido != undefined);
 
-
-
         return subtitles;
-
     }
     else {
         console.log("Estructura SRT incorrecta");
         return null;
     }
 
-
-
 }
-//Parámetros: array de objetos MergedSubtitle
-//Funcionamiento: devuelve un único String en formato SRT según los subtitúlos de entrada para ser copiado en un fichero de texto
-export function unParseMergedSRT(subtitles) {
-    let unParsedSRT = "";
-    for (let i = 0; i < subtitles.length; i++) {
-
-        unParsedSRT += (i + 1) + "\n" + toTimeStamp(subtitles[i].inicio) + " --> " + toTimeStamp(subtitles[i].final) + "\n" + subtitles[i].contenidoA + "\n" + subtitles[i].contenidoB + "\n\n";
-
-    }
-    return unParsedSRT;
-}
-//Parámetros: elemento HTML donde imprimir contenido para comparaciones visuales en la ventana y array de objetos "Subtitle"
-//Funcionamiento: (se presupone outPut = etiqueta <pre>)imprime en output lo que se imprimiría en el fichero SRT basándose
-//en un array de objetos "Subtitle"
-export function write(subtitles) {
+//Parámetros: array de objetos subtitle o mergedsubtitle
+//Funcionamiento: Devuelve un string(con todos sus saltos de línea) generado a partir de un array de objetos subtitle o mergesubtitle
+export function unParseSRT(subtitles) {
     let textContent = "";
 
     if (subtitles[0] instanceof Subtitle) {
@@ -189,7 +169,7 @@ export function write(subtitles) {
 
 }
 //Parámetros: dos arrays de objetos Subtitulos para fusionar
-//Funcionamiento: devuelve un array de objetos subtítulo resultado de fusionar los arrays de entrada
+//Funcionamiento: devuelve un array de objetos MergedSubtitle resultado de fusionar los arrays de entrada
 //utilizando la estrategia de eventos:en el resultado habrán subtítulos "espúreos" de corta duración en los que solo 
 //hay presente un idioma aun habiendo 1 o más subtítulos correspondientes en el otro idioma
 export function eventMerge(subtitlesA, subtitlesB) {
@@ -297,7 +277,7 @@ export function addPersistence(subtitles, persistenceTime) {
     }
 
 }
-//Parámetros: array de objetos subtitle y modo de optimización
+//Parámetros: array de objetos Mergedsubtitle y modo de optimización
 //Funcionamiento: devuelve un array de objetos subtitle, pero habiendo quitado los subtítulos "espúreos" utilizando una de las cuatro posibles
 //estrategias: prioridad arriba,prioridad abajo, maximizar tiempo y minimzar tiempo.
 export function optSubtitles(subtitles, optMode) {
@@ -356,7 +336,7 @@ export function optSubtitles(subtitles, optMode) {
             }
         });
         //Esto para quitar los subtitulos espureos que quedan, es decir los del idioma al que no se da prioridad, y manteniendo los subtítulos que 
-        //están solamente en un idioma
+        //están dos idiomas
         specialSubtitles = specialSubtitles.filter(function (item, index, array) {
             if (item.contenidoA == "-" && item.contenidoB != "-") {
                 if (index > 0 && index < array.length - 1) {
@@ -444,7 +424,7 @@ export function optSubtitles(subtitles, optMode) {
             }
         });
         //Esto para quitar los subtitulos espureos que quedan, es decir los del idioma al que no se da prioridad, y manteniendo los subtítulos que 
-        //están solamente en un idioma
+        //están en 2 idiomas
         specialSubtitles = specialSubtitles.filter(function (item, index, array) {
             if (item.contenidoB == "-" && item.contenidoA != "-") {
                 if (index > 0 && index < array.length - 1) {
@@ -501,7 +481,7 @@ export function optSubtitles(subtitles, optMode) {
                 }
             }
         }
-        //Esto para quitar subtitulos espureos del idioma al que se da priorridad
+        //Esto para quitar subtitulos espureos 
         specialSubtitles = subtitles.filter(function (item, index, array) {
             if (index > 0 && index < array.length - 1) {
                 if ((item.inicio >= array[index - 1].inicio && item.final <= array[index - 1].final) || (item.inicio >= array[index + 1].inicio && item.final <= array[index + 1].final)) {
@@ -597,9 +577,6 @@ export function optSubtitles(subtitles, optMode) {
             }
         }
     }
-
-
-
     return specialSubtitles;
 }
 //Parámetros:array de objetos subtitle

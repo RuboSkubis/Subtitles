@@ -6,5 +6,4 @@ export default function Evento(marca, idioma, tipo, texto = undefined) {
     this.idioma = idioma;
     this.tipo = tipo;
     this.texto = texto;
-
 }
