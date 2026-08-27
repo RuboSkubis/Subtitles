@@ -1,6 +1,6 @@
-import Subtitle from './Subtitle.js';
-import Evento from './Evento.js';
-import MergedSubtitle from './MergedSubtitle.js';
+import Subtitle from '../objects/Subtitle.js';
+import Evento from '../objects/Evento.js';
+import MergedSubtitle from '../objects/MergedSubtitle.js';
 
 const regExpInicio = /\d{2}:\d{2}:\d{2},\d{3}./;
 const regExpFinal = /.\d{2}:\d{2}:\d{2},\d{3}/;
