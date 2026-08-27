@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { read, toMiliSeconds, toTimeStamp, parseSRT, unParseSRT, eventMerge, addPersistence, optSubtitles, isContinuous } from '../lib/srtActions.js';
+import { read, parseSRT} from '../lib/srtActions.js';
 import { detect } from '../lib/jschardet.esm.min.js';
 
 export default function SRTInput({ idioma, color, handleSubtitlesChange, handleColorChange }) {

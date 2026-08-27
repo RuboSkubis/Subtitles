@@ -1,10 +1,6 @@
 import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from './assets/vite.svg';
-import heroImg from './assets/hero.png';
-import { read, toMiliSeconds, toTimeStamp, parseSRT, unParseSRT, eventMerge, addPersistence, optSubtitles, isContinuous } from './lib/srtActions.js';
+import { unParseSRT} from './lib/srtActions.js';
 import './App.css';
-import { detect } from './lib/jschardet.esm.min.js';
 import SRTInput from './components/SRTInput.jsx';
 import Output from './components/Output.jsx';
 import OptimizationSettings from './components/OptimizationSettings.jsx';

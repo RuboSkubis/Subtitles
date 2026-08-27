@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { read, toMiliSeconds, toTimeStamp, parseSRT, unParseSRT, eventMerge, addPersistence, optSubtitles, isContinuous } from '../lib/srtActions.js';
+import { unParseSRT, eventMerge, addPersistence, optSubtitles, isContinuous } from '../lib/srtActions.js';
 export default function MergeButton({ subtitlesA, subtitlesB, colorA, colorB, optModeOn, mode, persistenceTime, handleTextChange }) {
 
   const [fileName, setFileName] = useState("merged.srt");
