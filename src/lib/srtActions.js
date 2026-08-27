@@ -16,7 +16,7 @@ export async function read(entrada) {
         }
         fr.readAsArrayBuffer(entrada.files[0]);
     });
-    console.log("Comprobando que se ha actualizado githubpages");
+    
 
     return await promesaDefichero;
 }
